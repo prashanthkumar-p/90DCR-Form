@@ -1,172 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Daily Reflection Form</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    padding: 15px;
-    max-width: 600px;
-    margin: auto;
-  }
-  label {
-    font-weight: bold;
-    display: block;
-    margin-top: 15px;
-  }
-  input, select, textarea {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    box-sizing: border-box;
-  }
-  button {
-    margin-top: 20px;
-    padding: 12px;
-    width: 100%;
-    background-color: #4CAF50;
-    color: white;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-  }
-  pre {
-    background: #f4f4f4;
-    padding: 15px;
-    white-space: pre-wrap;
-    margin-top: 20px;
-    border-radius: 5px;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>90DCR Daily Reflection Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 1rem;
+      background: #f2f2f2;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 1rem;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.3rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 1.5rem;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 0.7rem;
+      width: 100%;
+      font-size: 1rem;
+      border-radius: 5px;
+    }
+
+    .output {
+      margin-top: 2rem;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      white-space: pre-wrap;
+    }
+  </style>
 </head>
 <body>
 
-<h2>Daily Reflection Form</h2>
+<h2>Daily 90DCR Reflection</h2>
 
 <form id="reflectionForm">
-  <label for="name">Name</label>
-  <input type="text" id="name" required />
+  <label for="name">Your Name</label>
+  <input type="text" id="name" name="name" required />
 
-  <label for="date">Date 📆</label>
-  <input type="date" id="date" required />
+  <label for="date">📆 Date</label>
+  <input type="date" id="date" name="date" required />
 
-  <label for="dcr">DCR 🏃 (e.g., 9/90)</label>
-  <input type="text" id="dcr" required />
+  <label for="dcr">🏃 DCR (Day number out of 90)</label>
+  <input type="text" id="dcr" name="dcr" required />
 
-  <label for="used">U ✅ (Used all products you can?)</label>
-  <select id="used" required>
-    <option value="">Select</option>
-    <option value="Yes - All I could use today">Yes - All I could use today</option>
+  <label for="u">U ✅ - Did you use all the products you could today?</label>
+  <select id="u" name="u">
+    <option value="Yes">Yes</option>
     <option value="No">No</option>
   </select>
 
-  <label for="listened">L 🎧 (Audio title and speakers)</label>
-  <input type="text" id="listened" required />
+  <label for="l">🎧 L - What did you listen to? (Audio title and speaker)</label>
+  <input type="text" id="l" name="l" />
 
-  <label for="listenedTakeaway">✍️ Key Takeaways from audio</label>
-  <textarea id="listenedTakeaway" rows="3" required></textarea>
+  <label for="lKey">✍️ Key Takeaways from Listening</label>
+  <textarea id="lKey" name="lKey"></textarea>
 
-  <label for="read">R 📖 (Book title and chapter)</label>
-  <input type="text" id="read" required />
+  <label for="r">📖 R - What did you read? (Book title and chapter)</label>
+  <input type="text" id="r" name="r" />
 
-  <label for="readTakeaway">✍️ Key Takeaways from reading</label>
-  <textarea id="readTakeaway" rows="3" required></textarea>
+  <label for="rKey">✍️ Key Takeaways from Reading</label>
+  <textarea id="rKey" name="rKey"></textarea>
 
-  <label for="associate">A 🤝 (Associate - select one)</label>
-  <select id="associate" required>
-    <option value="">Select</option>
+  <label for="accountability">A ✅ - Accountability Message</label>
+  <select id="accountability" name="accountability">
+    <option value="This Message" selected>This Message</option>
+    <option value="Other">Other</option>
+  </select>
+
+  <label for="associate">A 🤝 - Associate Group</label>
+  <select id="associate" name="associate">
     <option value="NA VES">NA VES</option>
     <option value="UK VES">UK VES</option>
     <option value="IND VES">IND VES</option>
     <option value="AUS VES">AUS VES</option>
   </select>
 
-  <label for="accountability">A ✅ (Accountability Message)</label>
-  <textarea id="accountability" rows="2" required></textarea>
-
-  <label for="conversationInitiated">C 🗣 (Conversation initiated?)</label>
-  <select id="conversationInitiated" required>
-    <option value="">Select</option>
-    <option value="No">No</option>
+  <label for="conversation">C 🗣 - Conversations Initiated</label>
+  <select id="conversation" name="conversation">
     <option value="Yes">Yes</option>
+    <option value="No">No</option>
   </select>
 
-  <div id="conversationLogicDiv" style="display:none;">
-    <label for="conversationLogic">If Yes, what mode?</label>
-    <select id="conversationLogic">
-      <option value="">Select</option>
-      <option value="Online">Online</option>
-      <option value="Offline">Offline</option>
-      <option value="Both">Both</option>
-    </select>
-  </div>
-
-  <label for="question">Additional Question (optional)</label>
-  <textarea id="question" rows="2"></textarea>
+  <label for="mode">Conversation Mode</label>
+  <select id="mode" name="mode">
+    <option value="Online">Online</option>
+    <option value="Offline">Offline</option>
+    <option value="Online and Offline">Both</option>
+  </select>
 
   <label for="reflections">Reflections</label>
-  <textarea id="reflections" rows="4" required></textarea>
+  <textarea id="reflections" name="reflections"></textarea>
 
-  <button type="submit">Submit</button>
+  <label for="question">❓ Any questions you want to ask? (Optional)</label>
+  <textarea id="question" name="question"></textarea>
+
+  <button type="submit">Submit and Copy</button>
 </form>
 
-<pre id="output"></pre>
+<div class="output" id="outputBox" style="display:none;"></div>
 
 <script>
-  const form = document.getElementById('reflectionForm');
-  const conversationSelect = document.getElementById('conversationInitiated');
-  const conversationLogicDiv = document.getElementById('conversationLogicDiv');
-  const conversationLogicSelect = document.getElementById('conversationLogic');
-  const output = document.getElementById('output');
+  document.getElementById("reflectionForm").addEventListener("submit", function(event) {
+    event.preventDefault();
 
-  // Show/hide conversation logic based on Yes/No
-  conversationSelect.addEventListener('change', () => {
-    if (conversationSelect.value === 'Yes') {
-      conversationLogicDiv.style.display = 'block';
-      conversationLogicSelect.setAttribute('required', 'required');
-    } else {
-      conversationLogicDiv.style.display = 'none';
-      conversationLogicSelect.removeAttribute('required');
-      conversationLogicSelect.value = '';
+    const get = id => document.getElementById(id).value;
+
+    let modeValue = get("mode");
+    if (modeValue === "Online and Offline") {
+      modeValue = "Online and Offline";
     }
-  });
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
+    const output = `**Name —** ${get("name")}
+**Date 📆 —** ${get("date")}
+**DCR 🏃 —** ${get("dcr")}/90
+**U ✅ —** ${get("u")} - All I could use today
+**L 🎧 —** ${get("l")}
+**✍️ Key Takeaways —** ${get("lKey")}
+**R 📖 —** ${get("r")}
+**✍️ Key Takeaways —** ${get("rKey")}
+**A ✅ —** ${get("accountability")}
+**A 🤝 —** ${get("associate")}
+**C 🗣 —** ${get("conversation")}
+**Mode —** ${modeValue}
+**Reflections —** ${get("reflections")}
+**❓Question —** ${get("question")}`;
 
-    // Prepare conversation mode text
-    let convMode = conversationLogicSelect.value;
-    if (convMode === 'Both') convMode = 'Online and Offline';
-
-    // Build the output string
-    const result = 
-`Name — ${document.getElementById('name').value}
-Date 📆 - ${document.getElementById('date').value}
-DCR 🏃 - ${document.getElementById('dcr').value}
-U ✅ - ${document.getElementById('used').value}
-L 🎧 - ${document.getElementById('listened').value}
-✍️ Key Takeaways - ${document.getElementById('listenedTakeaway').value}
-R 📖 - ${document.getElementById('read').value}
-✍️ Key Takeaways - ${document.getElementById('readTakeaway').value}
-A 🤝 - ${document.getElementById('associate').value}
-A ✅ - ${document.getElementById('accountability').value}
-C 🗣 - ${conversationSelect.value}
-${conversationSelect.value === 'Yes' ? `Logic - ${convMode}` : ''}
-Q ❓ - ${document.getElementById('question').value || 'N/A'}
-Reflections - ${document.getElementById('reflections').value}`;
-
-    // Show output
-    output.textContent = result;
-
-    // Copy to clipboard
-    navigator.clipboard.writeText(result).then(() => {
-      alert('Output copied to clipboard!');
-    }).catch(() => {
-      alert('Failed to copy output to clipboard. Please copy manually.');
+    navigator.clipboard.writeText(output).then(() => {
+      const box = document.getElementById("outputBox");
+      box.style.display = "block";
+      box.textContent = output;
+      alert("Copied to clipboard!");
     });
-
   });
 </script>
 
