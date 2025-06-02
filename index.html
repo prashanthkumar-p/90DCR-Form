@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>90DCR Daily Reflection Form</title>
+  <title>Daily DCR Reflection</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -43,6 +43,11 @@
       width: 100%;
       font-size: 1rem;
       border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #telegramBtn {
+      background-color: #0088cc;
     }
 
     .output {
@@ -57,16 +62,22 @@
 </head>
 <body>
 
-<h2>Daily 90DCR Reflection</h2>
+<h2>Daily DCR Reflection</h2>
 
 <form id="reflectionForm">
   <label for="name">Your Name</label>
   <input type="text" id="name" name="name" required />
 
+  <label for="dcrtype">DCR Type</label>
+  <select id="dcrtype" name="dcrtype" required>
+    <option value="30DCR">30DCR</option>
+    <option value="90DCR" selected>90DCR</option>
+  </select>
+
   <label for="date">📆 Date</label>
   <input type="date" id="date" name="date" required />
 
-  <label for="dcr">🏃 DCR (Day number out of 90)</label>
+  <label for="dcr">🏃 DCR (Day number)</label>
   <input type="text" id="dcr" name="dcr" required />
 
   <label for="u">U ✅ - Did you use all the products you could today?</label>
@@ -87,7 +98,7 @@
   <label for="rKey">✍️ Key Takeaways from Reading</label>
   <textarea id="rKey" name="rKey"></textarea>
 
- <label for="accountability">A ✅ - Accountability Message</label>
+  <label for="accountability">A ✅ - Accountability Message</label>
   <select id="accountability" name="accountability">
     <option value="This Message" selected>This Message</option>
     <option value="Other">Other</option>
@@ -121,6 +132,7 @@
   <textarea id="question" name="question"></textarea>
 
   <button type="submit">Submit and Copy</button>
+  <button type="button" id="telegramBtn" style="display:none;">Send via Telegram</button>
 </form>
 
 <div class="output" id="outputBox" style="display:none;"></div>
@@ -136,9 +148,9 @@
       modeValue = "Online and Offline";
     }
 
-    const output = `**Name —** ${get("name")}
+    const output = `**${get("name")} ${get("dcrtype")}**
 **Date 📆 —** ${get("date")}
-**DCR 🏃 —** ${get("dcr")}/90
+**DCR 🏃 —** ${get("dcr")}/${get("dcrtype")}
 **U ✅ —** ${get("u")} - All I could use today
 **L 🎧 —** ${get("l")}
 **✍️ Key Takeaways —** ${get("lKey")}
@@ -155,6 +167,15 @@
       const box = document.getElementById("outputBox");
       box.style.display = "block";
       box.textContent = output;
+
+      const telegramBtn = document.getElementById("telegramBtn");
+      telegramBtn.style.display = "block";
+      telegramBtn.onclick = function() {
+        const telegramText = encodeURIComponent(output);
+        const telegramUrl = `https://t.me/share/url?text=${telegramText}`;
+        window.open(telegramUrl, "_blank");
+      };
+
       alert("Copied to clipboard!");
     });
   });
