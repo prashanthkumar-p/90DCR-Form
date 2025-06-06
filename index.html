@@ -69,38 +69,169 @@
 <h2>Daily DCR Reflection</h2>
 
 <form id="reflectionForm">
-  <!-- form fields go here -->
+  <label for="name">Name</label>
+  <input type="text" id="name" name="name" required />
+
+  <label for="dcr">DCR</label>
+  <select id="dcr" name="dcr">
+    <option value="30DCR">30DCR</option>
+    <option value="90DCR">90DCR</option>
+  </select>
+
+  <label for="dcrDay">Day of Core Run</label>
+  <select id="dcrDay" name="dcrDay">
+    <option value="">Select Day</option>
+  </select>
+
+  <label for="u">U (Used all the products you can)</label>
+  <select id="u" name="u">
+    <option value="Yes">Yes - All I could use today</option>
+    <option value="No">No</option>
+  </select>
+
+  <label for="audioTrack">L - Audio Track</label>
+  <input type="text" id="audioTrack" name="audioTrack" />
+
+  <label for="speaker">L - Speaker</label>
+  <input type="text" id="speaker" name="speaker" />
+
+  <label for="listenTakeaway">L - Key Takeaways</label>
+  <textarea id="listenTakeaway" name="listenTakeaway"></textarea>
+
+  <label for="book">R - Book Title</label>
+  <input type="text" id="book" name="book" />
+
+  <label for="chapterNumber">R - Chapter Number</label>
+  <input type="text" id="chapterNumber" name="chapterNumber" />
+
+  <label for="chapterName">R - Chapter Name</label>
+  <input type="text" id="chapterName" name="chapterName" />
+
+  <label for="readTakeaway">R - Key Takeaways</label>
+  <textarea id="readTakeaway" name="readTakeaway"></textarea>
+
+  <label for="accountability">A ✅ - Accountability Message</label>
+  <select id="accountability">
+    <option value="This Message" selected>This Message</option>
+    <option value="Other">Other</option>
+  </select>
+
+  <label for="associate">A 🤝 - Associate</label>
+  <select id="associate">
+    <option value="NA VES">NA VES</option>
+    <option value="UK VES">UK VES</option>
+    <option value="IND VES">IND VES</option>
+    <option value="AUS VES">AUS VES</option>
+  </select>
+
+  <label for="eventStep">Sounds like the event stirred something — what’s one step you’re not willing to delay?</label>
+  <textarea id="eventStep" name="eventStep"></textarea>
+
+  <label for="conversation">C 🗣 - Conversations Initiated</label>
+  <select id="conversation" name="conversation">
+    <option value="Yes">Yes</option>
+    <option value="No">No</option>
+  </select>
+
+  <label for="conversationMode">Mode (Online, Offline, Both)</label>
+  <select id="conversationMode" name="conversationMode">
+    <option value="Online">Online</option>
+    <option value="Offline">Offline</option>
+    <option value="Online and Offline">Both</option>
+  </select>
+
+  <label for="journal">When you look back on today, who did you intentionally connect with to create momentum in your business?</label>
+  <textarea id="journal" name="journal"></textarea>
+
+  <label for="exercise">PE 🏋️ - Physical Exercise</label>
+  <select id="exercise" name="exercise" onchange="toggleOtherExercise(this)">
+    <option value="">Blank</option>
+    <option value="Run">Run</option>
+    <option value="Walk">Walk</option>
+    <option value="Swim">Swim</option>
+    <option value="Gym">Gym</option>
+    <option value="Yoga">Yoga</option>
+    <option value="Other">Other</option>
+  </select>
+  <div id="otherExerciseContainer">
+    <label for="otherExercise">Other Exercise</label>
+    <input type="text" id="otherExercise" name="otherExercise" />
+  </div>
+
+  <label for="meditation">M 🧘‍♂️ - Meditation</label>
+  <select id="meditation" name="meditation">
+    <option value="Yes">Yes</option>
+    <option value="No">No</option>
+  </select>
+
+  <label for="question">Ask a Question (optional)</label>
+  <textarea id="question" name="question"></textarea>
+
+  <button type="button" onclick="generateOutput()">Submit</button>
 </form>
 
 <div class="output" id="output"></div>
 
 <script>
-  function copyOutputToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-      console.log("Output copied to clipboard!");
-    }, err => {
-      alert("Failed to copy text: " + err);
-    });
+  function toggleOtherExercise(select) {
+    document.getElementById('otherExerciseContainer').style.display = select.value === 'Other' ? 'block' : 'none';
   }
 
-  document.getElementById("reflectionForm").addEventListener("submit", function(event) {
-    event.preventDefault();
+  // Populate DCR Day dropdown from 1 to 90
+  const dcrDaySelect = document.getElementById("dcrDay");
+  for (let i = 1; i <= 90; i++) {
+    const option = document.createElement("option");
+    option.value = `${i}`;
+    option.textContent = `${i}`;
+    dcrDaySelect.appendChild(option);
+  }
 
-    // Collect all your form data here and format it into `outputText`
-    const name = document.getElementById("name")?.value.trim() || "";
-    const dcr = document.getElementById("dcr")?.value || "";
-    const date = document.getElementById("date")?.value || "";
+  function generateOutput() {
+    const name = document.getElementById('name').value;
+    const dcr = document.getElementById('dcr').value;
+    const dcrDay = document.getElementById('dcrDay').value;
+    const u = document.getElementById('u').value;
+    const audioTrack = document.getElementById('audioTrack').value;
+    const speaker = document.getElementById('speaker').value;
+    const listenTakeaway = document.getElementById('listenTakeaway').value;
+    const book = document.getElementById('book').value;
+    const chapterNumber = document.getElementById('chapterNumber').value;
+    const chapterName = document.getElementById('chapterName').value;
+    const readTakeaway = document.getElementById('readTakeaway').value;
+    const accountability = document.getElementById('accountability').value;
+    const associate = document.getElementById('associate').value;
+    const eventStep = document.getElementById('eventStep').value;
+    const conversation = document.getElementById('conversation').value;
+    const conversationMode = document.getElementById('conversationMode').value;
+    const journal = document.getElementById('journal').value;
+    const exercise = document.getElementById('exercise').value;
+    const otherExercise = document.getElementById('otherExercise').value;
+    const meditation = document.getElementById('meditation').value;
+    const question = document.getElementById('question').value;
 
-    // Add logic to collect all other fields just like above...
+    const exerciseOutput = exercise === 'Other' ? otherExercise : exercise;
 
-    const outputText = `**${name} ${dcr}**\n📆 Date - ${date}\n...`; // Add the rest of your formatted output
+    const output = `**${name} ${dcr}**\n` +
+      `**Date 📆** - ${new Date().toISOString().slice(0, 10)}\n` +
+      `**DCR 🏃** - ${dcrDay}/${dcr.replace('DCR', '')}\n` +
+      `**U ✅** - ${u}\n` +
+      `**L 🎧** - ${audioTrack} - ${speaker}\n` +
+      `✍️ Key Takeaways - ${listenTakeaway}\n` +
+      `**R 📖** - ${book} - Chapter ${chapterNumber} - ${chapterName}\n` +
+      `✍️ Key Takeaways - ${readTakeaway}\n` +
+      `**A ✅** - ${accountability}\n` +
+      `**A 🤝** - ${associate}\n` +
+      `✍️ Key Takeaways - ${eventStep}\n` +
+      `**C 🗣** - ${conversation}\n` +
+      `Mode - ${conversationMode}\n` +
+      `Journal - ${journal}\n` +
+      `**PE 🏋️** - ${exerciseOutput}\n` +
+      `**M 🧘‍♂️** - ${meditation}\n` +
+      `${question ? `❓ Ask a Question - ${question}\n` : ''}`;
 
-    // Display on page
-    document.getElementById("output").innerText = outputText;
-
-    // Automatically copy it to clipboard
-    copyOutputToClipboard(outputText);
-  });
+    document.getElementById('output').innerText = output;
+    navigator.clipboard.writeText(output);
+  }
 </script>
 
 </body>
