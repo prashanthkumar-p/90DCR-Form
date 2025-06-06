@@ -74,17 +74,33 @@
 
 <div class="output" id="output"></div>
 
-<button onclick="copyOutputToClipboard()">Copy to Clipboard</button>
-
 <script>
-  function copyOutputToClipboard() {
-    const outputText = document.getElementById("output").innerText;
-    navigator.clipboard.writeText(outputText).then(() => {
-      alert("Output copied to clipboard!");
+  function copyOutputToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      console.log("Output copied to clipboard!");
     }, err => {
       alert("Failed to copy text: " + err);
     });
   }
+
+  document.getElementById("reflectionForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    // Collect all your form data here and format it into `outputText`
+    const name = document.getElementById("name")?.value.trim() || "";
+    const dcr = document.getElementById("dcr")?.value || "";
+    const date = document.getElementById("date")?.value || "";
+
+    // Add logic to collect all other fields just like above...
+
+    const outputText = `**${name} ${dcr}**\n📆 Date - ${date}\n...`; // Add the rest of your formatted output
+
+    // Display on page
+    document.getElementById("output").innerText = outputText;
+
+    // Automatically copy it to clipboard
+    copyOutputToClipboard(outputText);
+  });
 </script>
 
 </body>
