@@ -58,6 +58,10 @@
       border: 1px solid #ccc;
       white-space: pre-wrap;
     }
+
+    #otherExerciseContainer {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -86,99 +90,83 @@
     <option value="No">No</option>
   </select>
 
-  <label for="l">🎧 L - What did you listen to? (Audio title and speaker)</label>
-  <input type="text" id="l" name="l" />
+  <label>🎵 L - What did you listen to?</label>
+  <input type="text" id="audioTitle" placeholder="Audio Track Title" />
+  <input type="text" id="audioSpeaker" placeholder="Speaker Name" />
 
   <label for="lKey">✍️ Key Takeaways from Listening</label>
   <textarea id="lKey" name="lKey"></textarea>
 
-  <label for="r">📖 R - What did you read? (Book title and chapter)</label>
-  <input type="text" id="r" name="r" />
+  <label>📖 R - What did you read?</label>
+  <input type="text" id="bookTitle" placeholder="Book Title" />
+  <input type="text" id="bookChapter" placeholder="Chapter or Section" />
 
   <label for="rKey">✍️ Key Takeaways from Reading</label>
   <textarea id="rKey" name="rKey"></textarea>
 
   <label for="accountability">A ✅ - Accountability Message</label>
-  <select id="accountability" name="accountability">
+  <select id="accountability">
     <option value="This Message" selected>This Message</option>
-    <option value="Other">Other</option>
+    <option value="Custom">Custom</option>
   </select>
 
-  <label for="associate">A 🤝 - Associate Group</label>
-  <select id="associate" name="associate">
+  <label for="associate">A 🤝 - Associate</label>
+  <select id="associate">
     <option value="NA VES">NA VES</option>
     <option value="UK VES">UK VES</option>
     <option value="IND VES">IND VES</option>
     <option value="AUS VES">AUS VES</option>
   </select>
 
-  <label for="conversation">C 🗣 - Conversations Initiated</label>
-  <select id="conversation" name="conversation">
+  <label for="conversations">C 🗣 - Conversations Initiated</label>
+  <select id="conversations">
     <option value="Yes">Yes</option>
     <option value="No">No</option>
   </select>
 
-  <label for="mode">Conversation Mode</label>
-  <select id="mode" name="mode">
+  <label for="conversationMode">Mode of Conversation</label>
+  <select id="conversationMode">
+    <option value="">-- Select --</option>
     <option value="Online">Online</option>
     <option value="Offline">Offline</option>
-    <option value="Online and Offline">Both</option>
+    <option value="Both">Both</option>
+  </select>
+
+  <label for="exercise">PE 🏋️‍♂️ - Physical Exercise</label>
+  <select id="exercise" name="exercise">
+    <option value="">-- Select --</option>
+    <option value="Run">Run</option>
+    <option value="Walk">Walk</option>
+    <option value="Swim">Swim</option>
+    <option value="Gym">Gym</option>
+    <option value="Yoga">Yoga</option>
+    <option value="Other">Other</option>
+  </select>
+  <div id="otherExerciseContainer">
+    <label for="otherExercise">Please specify:</label>
+    <input type="text" id="otherExercise" name="otherExercise" />
+  </div>
+
+  <label for="meditation">M 🧘 - Meditation</label>
+  <select id="meditation" name="meditation">
+    <option value="Yes">Yes</option>
+    <option value="No">No</option>
   </select>
 
   <label for="reflections">Reflections</label>
   <textarea id="reflections" name="reflections"></textarea>
 
-  <label for="question">❓ Any questions you want to ask? (Optional)</label>
+  <label for="question">Ask a Question (Optional)</label>
   <textarea id="question" name="question"></textarea>
 
-  <button type="submit">Submit and Copy</button>
-  <button type="button" id="telegramBtn" style="display:none;">Send via Telegram</button>
+  <button type="submit">Submit</button>
+  <button type="button" id="telegramBtn">Send via Telegram</button>
 </form>
 
-<div class="output" id="outputBox" style="display:none;"></div>
+<div class="output" id="output"></div>
 
 <script>
-  document.getElementById("reflectionForm").addEventListener("submit", function(event) {
-    event.preventDefault();
-
-    const get = id => document.getElementById(id).value;
-
-    let modeValue = get("mode");
-    if (modeValue === "Online and Offline") {
-      modeValue = "Online and Offline";
-    }
-
-    const output = `**${get("name")} ${get("dcrtype")}**
-**Date 📆 —** ${get("date")}
-**DCR 🏃 —** ${get("dcr")}/${get("dcrtype")}
-**U ✅ —** ${get("u")} - All I could use today
-**L 🎧 —** ${get("l")}
-**✍️ Key Takeaways —** ${get("lKey")}
-**R 📖 —** ${get("r")}
-**✍️ Key Takeaways —** ${get("rKey")}
-**A ✅ —** ${get("accountability")}
-**A 🤝 —** ${get("associate")}
-**C 🗣 —** ${get("conversation")}
-**Mode —** ${modeValue}
-**Reflections —** ${get("reflections")}
-**❓Question —** ${get("question")}`;
-
-    navigator.clipboard.writeText(output).then(() => {
-      const box = document.getElementById("outputBox");
-      box.style.display = "block";
-      box.textContent = output;
-
-      const telegramBtn = document.getElementById("telegramBtn");
-      telegramBtn.style.display = "block";
-      telegramBtn.onclick = function() {
-        const telegramText = encodeURIComponent(output);
-        const telegramUrl = `https://t.me/share/url?text=${telegramText}`;
-        window.open(telegramUrl, "_blank");
-      };
-
-      alert("Copied to clipboard!");
-    });
-  });
+  // JavaScript logic goes here
 </script>
 
 </body>
