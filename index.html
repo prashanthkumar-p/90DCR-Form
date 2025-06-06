@@ -69,104 +69,22 @@
 <h2>Daily DCR Reflection</h2>
 
 <form id="reflectionForm">
-  <label for="name">Your Name</label>
-  <input type="text" id="name" name="name" required />
-
-  <label for="dcrtype">DCR Type</label>
-  <select id="dcrtype" name="dcrtype" required>
-    <option value="30DCR">30DCR</option>
-    <option value="90DCR" selected>90DCR</option>
-  </select>
-
-  <label for="date">📆 Date</label>
-  <input type="date" id="date" name="date" required />
-
-  <label for="dcr">🏃 DCR (Day number)</label>
-  <input type="text" id="dcr" name="dcr" required />
-
-  <label for="u">U ✅ - Did you use all the products you could today?</label>
-  <select id="u" name="u">
-    <option value="Yes">Yes</option>
-    <option value="No">No</option>
-  </select>
-
-  <label>🎵 L - What did you listen to?</label>
-  <input type="text" id="audioTitle" placeholder="Audio Track Title" />
-  <input type="text" id="audioSpeaker" placeholder="Speaker Name" />
-
-  <label for="lKey">✍️ Key Takeaways from Listening</label>
-  <textarea id="lKey" name="lKey"></textarea>
-
-  <label>📖 R - What did you read?</label>
-  <input type="text" id="bookTitle" placeholder="Book Title" />
-  <input type="text" id="bookChapter" placeholder="Chapter" />
-
-  <label for="rKey">✍️ Key Takeaways from Reading</label>
-  <textarea id="rKey" name="rKey"></textarea>
-
-  <label for="accountability">A ✅ - Accountability Message</label>
-  <select id="accountability">
-    <option value="This Message" selected>This Message</option>
-  </select>
-
-  <label for="associate">A 🤝 - Associate (Select)</label>
-  <select id="associate">
-    <option value="NA VES">NA VES</option>
-    <option value="UK VES">UK VES</option>
-    <option value="IND VES">IND VES</option>
-    <option value="AUS VES">AUS VES</option>
-  </select>
-
-  <label for="assocKey">Sounds like the event stirred something — what’s one step you’re not willing to delay?</label>
-  <textarea id="assocKey" name="assocKey"></textarea>
-
-  <label for="conversation">C 🗣 - Conversations Initiated</label>
-  <select id="conversation">
-    <option value="Yes">Yes</option>
-    <option value="No">No</option>
-  </select>
-
-  <label for="conversationMode">Conversation Mode</label>
-  <select id="conversationMode">
-    <option value="Online">Online</option>
-    <option value="Offline">Offline</option>
-    <option value="Both">Both</option>
-  </select>
-
-  <label for="journal">When you look back on today, who did you intentionally connect with to create momentum in your business?</label>
-  <textarea id="journal" name="journal"></textarea>
-
-  <label for="exercise">PE 🏋️‍♂️ - Physical Exercise</label>
-  <select id="exercise" name="exercise">
-    <option value="">Blank</option>
-    <option value="Run">Run</option>
-    <option value="Walk">Walk</option>
-    <option value="Swim">Swim</option>
-    <option value="Gym">Gym</option>
-    <option value="Yoga">Yoga</option>
-    <option value="Other">Other</option>
-  </select>
-  <div id="otherExerciseContainer">
-    <input type="text" id="otherExercise" placeholder="Specify Exercise" />
-  </div>
-
-  <label for="meditation">M 🧘 - Meditation</label>
-  <select id="meditation" name="meditation">
-    <option value="Yes">Yes</option>
-    <option value="No">No</option>
-  </select>
-
-  <label for="question">Ask a question (Optional)</label>
-  <textarea id="question" name="question"></textarea>
-
-  <button type="submit">Generate Output</button>
-  <button type="button" id="telegramBtn">Send via Telegram</button>
+  <!-- form fields go here -->
 </form>
 
 <div class="output" id="output"></div>
 
+<button onclick="copyOutputToClipboard()">Copy to Clipboard</button>
+
 <script>
-  // JavaScript code will go here to handle logic, output and Telegram send
+  function copyOutputToClipboard() {
+    const outputText = document.getElementById("output").innerText;
+    navigator.clipboard.writeText(outputText).then(() => {
+      alert("Output copied to clipboard!");
+    }, err => {
+      alert("Failed to copy text: " + err);
+    });
+  }
 </script>
 
 </body>
