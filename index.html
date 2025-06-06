@@ -99,7 +99,7 @@
 
   <label>📖 R - What did you read?</label>
   <input type="text" id="bookTitle" placeholder="Book Title" />
-  <input type="text" id="bookChapter" placeholder="Chapter or Section" />
+  <input type="text" id="bookChapter" placeholder="Chapter" />
 
   <label for="rKey">✍️ Key Takeaways from Reading</label>
   <textarea id="rKey" name="rKey"></textarea>
@@ -107,10 +107,9 @@
   <label for="accountability">A ✅ - Accountability Message</label>
   <select id="accountability">
     <option value="This Message" selected>This Message</option>
-    <option value="Custom">Custom</option>
   </select>
 
-  <label for="associate">A 🤝 - Associate</label>
+  <label for="associate">A 🤝 - Associate (Select)</label>
   <select id="associate">
     <option value="NA VES">NA VES</option>
     <option value="UK VES">UK VES</option>
@@ -118,23 +117,28 @@
     <option value="AUS VES">AUS VES</option>
   </select>
 
-  <label for="conversations">C 🗣 - Conversations Initiated</label>
-  <select id="conversations">
+  <label for="assocKey">Sounds like the event stirred something — what’s one step you’re not willing to delay?</label>
+  <textarea id="assocKey" name="assocKey"></textarea>
+
+  <label for="conversation">C 🗣 - Conversations Initiated</label>
+  <select id="conversation">
     <option value="Yes">Yes</option>
     <option value="No">No</option>
   </select>
 
-  <label for="conversationMode">Mode of Conversation</label>
+  <label for="conversationMode">Conversation Mode</label>
   <select id="conversationMode">
-    <option value="">-- Select --</option>
     <option value="Online">Online</option>
     <option value="Offline">Offline</option>
     <option value="Both">Both</option>
   </select>
 
+  <label for="journal">When you look back on today, who did you intentionally connect with to create momentum in your business?</label>
+  <textarea id="journal" name="journal"></textarea>
+
   <label for="exercise">PE 🏋️‍♂️ - Physical Exercise</label>
   <select id="exercise" name="exercise">
-    <option value="">-- Select --</option>
+    <option value="">Blank</option>
     <option value="Run">Run</option>
     <option value="Walk">Walk</option>
     <option value="Swim">Swim</option>
@@ -143,8 +147,7 @@
     <option value="Other">Other</option>
   </select>
   <div id="otherExerciseContainer">
-    <label for="otherExercise">Please specify:</label>
-    <input type="text" id="otherExercise" name="otherExercise" />
+    <input type="text" id="otherExercise" placeholder="Specify Exercise" />
   </div>
 
   <label for="meditation">M 🧘 - Meditation</label>
@@ -153,20 +156,17 @@
     <option value="No">No</option>
   </select>
 
-  <label for="reflections">Reflections</label>
-  <textarea id="reflections" name="reflections"></textarea>
-
-  <label for="question">Ask a Question (Optional)</label>
+  <label for="question">Ask a question (Optional)</label>
   <textarea id="question" name="question"></textarea>
 
-  <button type="submit">Submit</button>
+  <button type="submit">Generate Output</button>
   <button type="button" id="telegramBtn">Send via Telegram</button>
 </form>
 
 <div class="output" id="output"></div>
 
 <script>
-  // JavaScript logic goes here
+  // JavaScript code will go here to handle logic, output and Telegram send
 </script>
 
 </body>
