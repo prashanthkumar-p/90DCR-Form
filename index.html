@@ -79,9 +79,7 @@
   </select>
 
   <label for="dcrDay">Day of Core Run</label>
-  <select id="dcrDay" name="dcrDay">
-    <option value="">Select Day</option>
-  </select>
+  <select id="dcrDay" name="dcrDay"></select>
 
   <label for="u">U (Used all the products you can)</label>
   <select id="u" name="u">
@@ -111,21 +109,21 @@
   <textarea id="readTakeaway" name="readTakeaway"></textarea>
 
   <label for="accountability">A ✅ - Accountability Message</label>
-  <select id="accountability">
+  <select id="accountability" name="accountability">
     <option value="This Message" selected>This Message</option>
     <option value="Other">Other</option>
   </select>
 
   <label for="associate">A 🤝 - Associate</label>
-  <select id="associate">
+  <select id="associate" name="associate">
     <option value="NA VES">NA VES</option>
     <option value="UK VES">UK VES</option>
     <option value="IND VES">IND VES</option>
     <option value="AUS VES">AUS VES</option>
   </select>
 
-  <label for="eventStep">Sounds like the event stirred something — what’s one step you’re not willing to delay?</label>
-  <textarea id="eventStep" name="eventStep"></textarea>
+  <label for="associateTakeaway">Sounds like the event stirred something — what’s one step you’re not willing to delay?</label>
+  <textarea id="associateTakeaway" name="associateTakeaway"></textarea>
 
   <label for="conversation">C 🗣 - Conversations Initiated</label>
   <select id="conversation" name="conversation">
@@ -133,19 +131,19 @@
     <option value="No">No</option>
   </select>
 
-  <label for="conversationMode">Mode (Online, Offline, Both)</label>
+  <label for="conversationMode">Mode</label>
   <select id="conversationMode" name="conversationMode">
     <option value="Online">Online</option>
     <option value="Offline">Offline</option>
-    <option value="Online and Offline">Both</option>
+    <option value="Both">Both</option>
   </select>
 
-  <label for="journal">When you look back on today, who did you intentionally connect with to create momentum in your business?</label>
-  <textarea id="journal" name="journal"></textarea>
+  <label for="momentumConnect">When you look back on today, who did you intentionally connect with to create momentum in your business?</label>
+  <textarea id="momentumConnect" name="momentumConnect"></textarea>
 
-  <label for="exercise">PE 🏋️ - Physical Exercise</label>
-  <select id="exercise" name="exercise" onchange="toggleOtherExercise(this)">
-    <option value="">Blank</option>
+  <label for="exercise">🏃‍♂️ PE - Physical Exercise</label>
+  <select id="exercise" name="exercise">
+    <option value="">None</option>
     <option value="Run">Run</option>
     <option value="Walk">Walk</option>
     <option value="Swim">Swim</option>
@@ -153,86 +151,32 @@
     <option value="Yoga">Yoga</option>
     <option value="Other">Other</option>
   </select>
-  <div id="otherExerciseContainer">
-    <label for="otherExercise">Other Exercise</label>
-    <input type="text" id="otherExercise" name="otherExercise" />
-  </div>
+  <input type="text" id="otherExercise" name="otherExercise" placeholder="Specify other exercise" style="display:none;" />
 
-  <label for="meditation">M 🧘‍♂️ - Meditation</label>
+  <label for="meditation">🧘‍♂️ M - Meditation</label>
   <select id="meditation" name="meditation">
     <option value="Yes">Yes</option>
     <option value="No">No</option>
   </select>
 
-  <label for="question">Ask a Question (optional)</label>
+  <label for="question">Ask a question (optional)</label>
   <textarea id="question" name="question"></textarea>
 
-  <button type="button" onclick="generateOutput()">Submit</button>
+  <label for="journal">Journal</label>
+  <textarea id="journal" name="journal"></textarea>
+
+  <button type="submit">Submit</button>
 </form>
 
 <div class="output" id="output"></div>
 
 <script>
-  function toggleOtherExercise(select) {
-    document.getElementById('otherExerciseContainer').style.display = select.value === 'Other' ? 'block' : 'none';
-  }
-
   // Populate DCR Day dropdown from 1 to 90
-  const dcrDaySelect = document.getElementById("dcrDay");
+  const dcrDaySelect = document.getElementById('dcrDay');
   for (let i = 1; i <= 90; i++) {
-    const option = document.createElement("option");
-    option.value = `${i}`;
-    option.textContent = `${i}`;
+    const option = document.createElement('option');
+    option.value = `${i}/90`;
+    option.textContent = `${i}/90`;
     dcrDaySelect.appendChild(option);
   }
-
-  function generateOutput() {
-    const name = document.getElementById('name').value;
-    const dcr = document.getElementById('dcr').value;
-    const dcrDay = document.getElementById('dcrDay').value;
-    const u = document.getElementById('u').value;
-    const audioTrack = document.getElementById('audioTrack').value;
-    const speaker = document.getElementById('speaker').value;
-    const listenTakeaway = document.getElementById('listenTakeaway').value;
-    const book = document.getElementById('book').value;
-    const chapterNumber = document.getElementById('chapterNumber').value;
-    const chapterName = document.getElementById('chapterName').value;
-    const readTakeaway = document.getElementById('readTakeaway').value;
-    const accountability = document.getElementById('accountability').value;
-    const associate = document.getElementById('associate').value;
-    const eventStep = document.getElementById('eventStep').value;
-    const conversation = document.getElementById('conversation').value;
-    const conversationMode = document.getElementById('conversationMode').value;
-    const journal = document.getElementById('journal').value;
-    const exercise = document.getElementById('exercise').value;
-    const otherExercise = document.getElementById('otherExercise').value;
-    const meditation = document.getElementById('meditation').value;
-    const question = document.getElementById('question').value;
-
-    const exerciseOutput = exercise === 'Other' ? otherExercise : exercise;
-
-    const output = `**${name} ${dcr}**\n` +
-      `**Date 📆** - ${new Date().toISOString().slice(0, 10)}\n` +
-      `**DCR 🏃** - ${dcrDay}/${dcr.replace('DCR', '')}\n` +
-      `**U ✅** - ${u}\n` +
-      `**L 🎧** - ${audioTrack} - ${speaker}\n` +
-      `✍️ Key Takeaways - ${listenTakeaway}\n` +
-      `**R 📖** - ${book} - Chapter ${chapterNumber} - ${chapterName}\n` +
-      `✍️ Key Takeaways - ${readTakeaway}\n` +
-      `**A ✅** - ${accountability}\n` +
-      `**A 🤝** - ${associate}\n` +
-      `✍️ Key Takeaways - ${eventStep}\n` +
-      `**C 🗣** - ${conversation}\n` +
-      `Mode - ${conversationMode}\n` +
-      `Journal - ${journal}\n` +
-      `**PE 🏋️** - ${exerciseOutput}\n` +
-      `**M 🧘‍♂️** - ${meditation}\n` +
-      `${question ? `❓ Ask a Question - ${question}\n` : ''}`;
-
-    document.getElementById('output').innerText = output;
-    navigator.clipboard.writeText(output);
-  }
 </script>
-
-</body>
-</html>
