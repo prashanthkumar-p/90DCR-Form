@@ -1,125 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Daily Reflection Form</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    padding: 15px;
-    max-width: 600px;
-    margin: auto;
-  }
-  label {
-    font-weight: bold;
-    display: block;
-    margin-top: 15px;
-  }
-  input, select, textarea {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    box-sizing: border-box;
-  }
-  button {
-    margin-top: 20px;
-    padding: 12px;
-    width: 100%;
-    background-color: #4CAF50;
-    color: white;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-  }
-  pre {
-    background: #f4f4f4;
-    padding: 15px;
-    white-space: pre-wrap;
-    margin-top: 20px;
-    border-radius: 5px;
-  }
-</style>
-</head>
-<body>
-
-<h2>Daily Reflection Form</h2>
-
-<form id="reflectionForm">
-  <label for="name">Name</label>
-  <input type="text" id="name" required />
-
-  <label for="date">Date 📆</label>
-  <input type="date" id="date" required />
-
-  <label for="dcr">DCR 🏃 (e.g., 9/90)</label>
-  <input type="text" id="dcr" required />
-
-  <label for="used">U ✅ (Used all products you can?)</label>
-  <select id="used" required>
-    <option value="">Select</option>
-    <option value="Yes - All I could use today">Yes - All I could use today</option>
-    <option value="No">No</option>
-  </select>
-
-  <label for="listened">L 🎧 (Audio title and speakers)</label>
-  <input type="text" id="listened" required />
-
-  <label for="listenedTakeaway">✍️ Key Takeaways from audio</label>
-  <textarea id="listenedTakeaway" rows="3" required></textarea>
-
-  <label for="read">R 📖 (Book title and chapter)</label>
-  <input type="text" id="read" required />
-
-  <label for="readTakeaway">✍️ Key Takeaways from reading</label>
-  <textarea id="readTakeaway" rows="3" required></textarea>
-
-  <label for="associate">A 🤝 (Associate - select one)</label>
-  <select id="associate" required>
-    <option value="">Select</option>
-    <option value="NA VES">NA VES</option>
-    <option value="UK VES">UK VES</option>
-    <option value="IND VES">IND VES</option>
-    <option value="AUS VES">AUS VES</option>
-  </select>
-
-  <label for="accountability">A ✅ (Accountability Message)</label>
-  <textarea id="accountability" rows="2" required></textarea>
-
-  <label for="conversationInitiated">C 🗣 (Conversation initiated?)</label>
-  <select id="conversationInitiated" required>
-    <option value="">Select</option>
-    <option value="No">No</option>
-    <option value="Yes">Yes</option>
-  </select>
-
-  <div id="conversationLogicDiv" style="display:none;">
-    <label for="conversationLogic">If Yes, what mode?</label>
-    <select id="conversationLogic">
-      <option value="">Select</option>
-      <option value="Online">Online</option>
-      <option value="Offline">Offline</option>
-      <option value="Both">Both</option>
-    </select>
-  </div>
-
-  <label for="question">Additional Question (optional)</label>
-  <textarea id="question" rows="2"></textarea>
-
-  <label for="reflections">Reflections</label>
-  <textarea id="reflections" rows="4" required></textarea>
-
-  <button type="submit">Submit</button>
-</form>
-
-<pre id="output"></pre>
-
 <script>
   const form = document.getElementById('reflectionForm');
   const conversationSelect = document.getElementById('conversationInitiated');
   const conversationLogicDiv = document.getElementById('conversationLogicDiv');
   const conversationLogicSelect = document.getElementById('conversationLogic');
   const output = document.getElementById('output');
+
+  // 🔗 YOUR GOOGLE APPS SCRIPT WEB APP URL
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxRA0wb3JZs3WAdvJmQJRbwi4k1YSJ8UD-tQxsXc13Xxsrz4vNCbsetG26g7Ya1UnCPVA/exec";
 
   // Show/hide conversation logic based on Yes/No
   conversationSelect.addEventListener('change', () => {
@@ -133,14 +20,14 @@
     }
   });
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     // Prepare conversation mode text
     let convMode = conversationLogicSelect.value;
     if (convMode === 'Both') convMode = 'Online and Offline';
 
-    // Build the output string
+    // Build the output string (your existing logic unchanged)
     const result = 
 `Name — ${document.getElementById('name').value}
 Date 📆 - ${document.getElementById('date').value}
@@ -160,38 +47,48 @@ Reflections - ${document.getElementById('reflections').value}`;
     // Show output
     output.textContent = result;
 
-    // Copy to clipboard
-    navigator.clipboard.writeText(result).then(() => {
+    // Copy to clipboard (your existing feature)
+    try {
+      await navigator.clipboard.writeText(result);
       alert('Output copied to clipboard!');
-    }).catch(() => {
-      alert('Failed to copy output to clipboard. Please copy manually.');
-    });
+    } catch (err) {
+      alert('Failed to copy output. But submission is still sent.');
+    }
+
+    // 🚀 SEND TO GOOGLE SCRIPT (THIS TRIGGERS TELEGRAM)
+    const payload = {
+      name: document.getElementById('name').value,
+      date: document.getElementById('date').value,
+      dcr: document.getElementById('dcr').value,
+      used: document.getElementById('used').value,
+      listened: document.getElementById('listened').value,
+      listenedTakeaway: document.getElementById('listenedTakeaway').value,
+      read: document.getElementById('read').value,
+      readTakeaway: document.getElementById('readTakeaway').value,
+      associate: document.getElementById('associate').value,
+      accountability: document.getElementById('accountability').value,
+      conversation: conversationSelect.value,
+      conversationMode: convMode,
+      question: document.getElementById('question').value,
+      reflections: document.getElementById('reflections').value
+    };
+
+    try {
+      const response = await fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const text = await response.text();
+      console.log("Telegram Response:", text);
+
+    } catch (error) {
+      console.error("Telegram send failed:", error);
+      alert("Form saved locally but Telegram notification failed.");
+    }
 
   });
 </script>
-
-</body>
-</html>
-const formData = {
-    name: document.getElementById("name").value,
-    wins: document.getElementById("wins").value,
-    challenges: document.getElementById("challenges").value,
-    tomorrow: document.getElementById("tomorrow").value
-};
-
-fetch("https://script.google.com/macros/s/AKfycbxRA0wb3JZs3WAdvJmQJRbwi4k1YSJ8UD-tQxsXc13Xxsrz4vNCbsetG26g7Ya1UnCPVA/exec", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify(formData)
-})
-.then(response => response.text())
-.then(data => {
-    alert("Reflection Submitted Successfully!");
-    console.log(data);
-})
-.catch(error => {
-    console.error("Error:", error);
-    alert("Submission failed.");
-});
