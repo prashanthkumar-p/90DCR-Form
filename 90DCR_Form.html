@@ -172,3 +172,26 @@ Reflections - ${document.getElementById('reflections').value}`;
 
 </body>
 </html>
+const formData = {
+    name: document.getElementById("name").value,
+    wins: document.getElementById("wins").value,
+    challenges: document.getElementById("challenges").value,
+    tomorrow: document.getElementById("tomorrow").value
+};
+
+fetch("https://script.google.com/macros/s/AKfycbxRA0wb3JZs3WAdvJmQJRbwi4k1YSJ8UD-tQxsXc13Xxsrz4vNCbsetG26g7Ya1UnCPVA/exec", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(formData)
+})
+.then(response => response.text())
+.then(data => {
+    alert("Reflection Submitted Successfully!");
+    console.log(data);
+})
+.catch(error => {
+    console.error("Error:", error);
+    alert("Submission failed.");
+});
