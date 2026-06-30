@@ -418,63 +418,28 @@ form.addEventListener("submit", async (e) => {
     journal: document.getElementById("journal").value
   };
 
-  const result =
-`ALTAGRID
-Daily Reflection
+const result =
+`━━━━━━━━━━━━━━━━━━
 
-━━━━━━━━━━━━━━━━━━
-
-🏃 ${data.name}
-${data.dcr} • Day ${data.dcrDay}
+🏃 ${data.name.toUpperCase()}- ${data.dcr} • Day ${data.dcrDay}
 📅 ${data.date}
 
 ━━━━━━━━━━━━━━━━━━
 
-✅ Used Products
-${data.used}
-
-🎧 Listen
-${data.audioTrack || "N/A"}
-${data.speaker || ""}
-
-📝 Key Takeaways
-${data.listenTakeaway || "N/A"}
-
-📖 Reading
-${data.book || "N/A"}
+✅ Used Products: ${data.used}
+🎧 Listen: ${data.audioTrack || "N/A"}${data.speaker ? " -" + data.speaker : ""}
+📝 Key Takeaways: ${data.listenTakeaway || "N/A"}
+📖 Reading: ${data.book || "N/A"}
 Chapter ${data.chapterNumber || "N/A"} - ${data.chapterName || "N/A"}
-
-📝 Reading Takeaways
-${data.readingTakeaway || "N/A"}
-
-🤝 Associate
-${data.associate}
-
-🎯 One Step
-${data.aFollow || "N/A"}
-
-🗣 Conversations
-${data.conversation} (${data.mode})
-
-📅 PA's Today
-${data.paCount}
-
-📋 Types
-${data.paTypes}
-
-🏃 Physical Exercise
-${data.exercise}
-
-🧘 Meditation
-${data.meditation}
-
-💭 Reflection
-${data.journal || "N/A"}
-
-━━━━━━━━━━━━━━━━━━
-
-Keep Going.
-One Day. One Decision. One Win.`;
+📝 Reading Takeaways: ${data.readingTakeaway || "N/A"}
+🤝 Associate: ${data.associate}
+🎯 One Step: ${data.aFollow || "N/A"}
+🗣 Conversations: ${data.conversation} (${data.mode})
+📅 PA's Today: ${data.paCount}
+📋 Types: ${data.paTypes}
+🏃 Physical Exercise: ${data.exercise}
+🧘 Meditation: ${data.meditation}
+💭 Reflection: ${data.journal || "N/A"}`;
 
   data.fullOutput = result;
 
