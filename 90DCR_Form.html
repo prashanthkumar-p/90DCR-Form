@@ -12,17 +12,20 @@
     max-width: 600px;
     margin: auto;
   }
+
   label {
     font-weight: bold;
     display: block;
     margin-top: 15px;
   }
+
   input, select, textarea {
     width: 100%;
     padding: 8px;
     margin-top: 5px;
     box-sizing: border-box;
   }
+
   button {
     margin-top: 20px;
     padding: 12px;
@@ -33,6 +36,7 @@
     border: none;
     border-radius: 5px;
   }
+
   pre {
     background: #f4f4f4;
     padding: 15px;
@@ -123,10 +127,8 @@
   const conversationLogicSelect = document.getElementById('conversationLogic');
   const output = document.getElementById('output');
 
-  // 🔗 YOUR GOOGLE APPS SCRIPT URL
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxRA0wb3JZs3WAdvJmQJRbwi4k1YSJ8UD-tQxsXc13Xxsrz4vNCbsetG26g7Ya1UnCPVA/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxI7YYgib0Ttox7DiIsju6KHJ7pcsstYml_mCM4MpwvDpxCpGfT5Q4lZCHceeE49GE0/exec";
 
-  // Show/hide logic
   conversationSelect.addEventListener('change', () => {
     if (conversationSelect.value === 'Yes') {
       conversationLogicDiv.style.display = 'block';
@@ -144,8 +146,7 @@
     let convMode = conversationLogicSelect.value;
     if (convMode === 'Both') convMode = 'Online and Offline';
 
-    // 📄 Build output preview (your existing feature)
-    const result = 
+    const result =
 `Name — ${document.getElementById('name').value}
 Date 📆 - ${document.getElementById('date').value}
 DCR 🏃 - ${document.getElementById('dcr').value}
@@ -163,15 +164,12 @@ Reflections - ${document.getElementById('reflections').value}`;
 
     output.textContent = result;
 
-    // 📋 Copy to clipboard
     try {
       await navigator.clipboard.writeText(result);
-      alert('Output copied to clipboard!');
     } catch (err) {
-      alert('Could not copy, but form will still submit.');
+      console.log("Clipboard copy failed:", err);
     }
 
-    // 🚀 SEND TO GOOGLE SCRIPT (TRIGGERS TELEGRAM)
     const payload = {
       name: document.getElementById('name').value,
       date: document.getElementById('date').value,
@@ -192,20 +190,21 @@ Reflections - ${document.getElementById('reflections').value}`;
     try {
       const response = await fetch(SCRIPT_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify(payload)
       });
 
       const text = await response.text();
       console.log("Server Response:", text);
 
+      alert("Submitted successfully and sent to Telegram!");
+
+      form.reset();
+      conversationLogicDiv.style.display = 'none';
+
     } catch (error) {
       console.error("Submission error:", error);
-      alert("Form saved locally, but Telegram notification failed.");
+      alert("Form submitted locally, but Telegram notification failed.");
     }
-
   });
 </script>
 
