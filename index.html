@@ -3,15 +3,43 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#2f7d4f" />
 <title>DCR Reflection v2.0</title>
+<link rel="manifest" href="manifest.json" />
 
 <style>
+  :root {
+    --bg-1: #f3f7fb;
+    --bg-2: #e7f0ec;
+    --card: #ffffff;
+    --text: #222222;
+    --muted: #666666;
+    --primary: #2f7d4f;
+    --border: #cccccc;
+    --soft: #fafafa;
+    --output-bg: #111111;
+    --output-text: #ffffff;
+  }
+
+  body.dark {
+    --bg-1: #111827;
+    --bg-2: #0f172a;
+    --card: #1f2937;
+    --text: #f9fafb;
+    --muted: #cbd5e1;
+    --primary: #3fae6f;
+    --border: #475569;
+    --soft: #111827;
+    --output-bg: #020617;
+    --output-text: #f8fafc;
+  }
+
   body {
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #f3f7fb, #e7f0ec);
+    background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
     margin: 0;
     padding: 16px;
-    color: #222;
+    color: var(--text);
   }
 
   .app {
@@ -20,7 +48,7 @@
   }
 
   .hero {
-    background: white;
+    background: var(--card);
     border-radius: 18px;
     padding: 22px;
     text-align: center;
@@ -32,7 +60,7 @@
     font-size: 13px;
     letter-spacing: 3px;
     font-weight: bold;
-    color: #2f7d4f;
+    color: var(--primary);
   }
 
   h1 {
@@ -42,11 +70,23 @@
 
   .tagline {
     font-size: 14px;
-    color: #666;
+    color: var(--muted);
+  }
+
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .toolbar button {
+    margin-top: 0;
+    font-size: 14px;
+    padding: 10px;
   }
 
   .card {
-    background: white;
+    background: var(--card);
     border-radius: 16px;
     padding: 18px;
     margin-bottom: 16px;
@@ -70,9 +110,11 @@
     padding: 11px;
     margin-top: 6px;
     border-radius: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border);
     box-sizing: border-box;
     font-size: 15px;
+    background: var(--card);
+    color: var(--text);
   }
 
   textarea {
@@ -85,7 +127,7 @@
     gap: 12px;
   }
 
-  .pa-grid {
+  .pa-grid, .exercise-grid, .stats-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
@@ -93,16 +135,63 @@
   }
 
   .check-item {
-    border: 1px solid #ccc;
+    border: 1px solid var(--border);
     border-radius: 10px;
     padding: 10px;
-    background: #fafafa;
+    background: var(--soft);
     font-weight: bold;
   }
 
   .check-item input {
     width: auto;
     margin-right: 8px;
+  }
+
+  .stat-box {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    background: var(--soft);
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--primary);
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .progress-wrap {
+    margin-top: 12px;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .progress-bar {
+    height: 16px;
+    background: var(--soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--primary);
+    transition: width 0.3s ease;
   }
 
   button {
@@ -113,7 +202,7 @@
     font-size: 17px;
     font-weight: bold;
     color: white;
-    background: #2f7d4f;
+    background: var(--primary);
     margin-top: 12px;
     cursor: pointer;
   }
@@ -122,9 +211,13 @@
     background: #999;
   }
 
+  .secondary-btn {
+    background: #64748b;
+  }
+
   .output {
-    background: #111;
-    color: white;
+    background: var(--output-bg);
+    color: var(--output-text);
     border-radius: 18px;
     padding: 22px;
     white-space: pre-wrap;
@@ -138,8 +231,9 @@
   }
 
   @media (max-width: 520px) {
-    .row, .pa-grid {
+    .row, .pa-grid, .exercise-grid, .stats-grid, .toolbar {
       grid-template-columns: 1fr;
+      flex-direction: column;
     }
   }
 </style>
@@ -152,6 +246,33 @@
     <div class="brand">α Team</div>
     <h1>DCR Reflection </h1>
     <div class="tagline">You do not rise to the level of your goals; you fall to the level of your systems..</div>
+    <div class="toolbar">
+      <button type="button" id="darkModeBtn">🌙 Dark Mode</button>
+      <button type="button" id="installBtn" class="secondary-btn hidden">📱 Install App</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📊 Running Totals</h3>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-number" id="totalBooks">0</div>
+        <div class="stat-label">Total Books Completed</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number" id="totalPAs">0</div>
+        <div class="stat-label">Total PAs</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number" id="totalConversations">0</div>
+        <div class="stat-label">Total Conversation Days</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number" id="totalExerciseDays">0</div>
+        <div class="stat-label">Total Exercise Days</div>
+      </div>
+    </div>
+    <button type="button" id="resetStatsBtn" class="secondary-btn">Reset Running Totals</button>
   </div>
 
   <form id="reflectionForm">
@@ -182,6 +303,16 @@
           </select>
         </div>
       </div>
+
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span id="progressText">Progress: Select DCR</span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
     </div>
 
     <div class="card">
@@ -210,7 +341,28 @@
       <h3>📖 R — Reading</h3>
 
       <label>Book Title</label>
-      <input type="text" id="book" />
+      <select id="book">
+        <option value="">Select Book</option>
+        <option value="How I Raised Myself from Failure to Success in Selling">How I Raised Myself from Failure to Success in Selling</option>
+        <option value="Magic of Thinking Big">Magic of Thinking Big</option>
+        <option value="Mindset">Mindset</option>
+        <option value="Relentless">Relentless</option>
+        <option value="Surrounded By Idiots">Surrounded By Idiots</option>
+        <option value="The Compound Effect">The Compound Effect</option>
+        <option value="Think & Grow Rich">Think & Grow Rich</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <div id="otherBookBox" class="hidden">
+        <label>Other Book Name</label>
+        <input type="text" id="otherBook" />
+      </div>
+
+      <label>Did you complete this book today?</label>
+      <select id="bookCompleted">
+        <option value="No">No</option>
+        <option value="Yes">Yes</option>
+      </select>
 
       <div class="row">
         <div>
@@ -294,15 +446,14 @@
       <h3>🏃 Physical + 🧘 Meditation</h3>
 
       <label>Physical Exercise</label>
-      <select id="exercise">
-        <option value="">Blank</option>
-        <option value="Run">Run</option>
-        <option value="Walk">Walk</option>
-        <option value="Swim">Swim</option>
-        <option value="Gym">Gym</option>
-        <option value="Yoga">Yoga</option>
-        <option value="Other">Other</option>
-      </select>
+      <div class="exercise-grid">
+        <label class="check-item"><input type="checkbox" value="Run" class="exerciseType"> Run</label>
+        <label class="check-item"><input type="checkbox" value="Walk" class="exerciseType"> Walk</label>
+        <label class="check-item"><input type="checkbox" value="Swim" class="exerciseType"> Swim</label>
+        <label class="check-item"><input type="checkbox" value="Gym" class="exerciseType"> Gym</label>
+        <label class="check-item"><input type="checkbox" value="Yoga" class="exerciseType"> Yoga</label>
+        <label class="check-item"><input type="checkbox" value="Other" id="otherExerciseCheck" class="exerciseType"> Other</label>
+      </div>
 
       <div id="otherExerciseBox" class="hidden">
         <label>Specify Exercise</label>
@@ -341,19 +492,37 @@ const dcrDay = document.getElementById("dcrDay");
 const dateInput = document.getElementById("date");
 const paCount = document.getElementById("paCount");
 const paTypesBox = document.getElementById("paTypesBox");
-const exercise = document.getElementById("exercise");
 const otherExerciseBox = document.getElementById("otherExerciseBox");
+const otherExerciseCheck = document.getElementById("otherExerciseCheck");
+const book = document.getElementById("book");
+const otherBookBox = document.getElementById("otherBookBox");
 const output = document.getElementById("output");
 const submitBtn = document.getElementById("submitBtn");
+const darkModeBtn = document.getElementById("darkModeBtn");
+const installBtn = document.getElementById("installBtn");
+const resetStatsBtn = document.getElementById("resetStatsBtn");
+const progressText = document.getElementById("progressText");
+const progressPercent = document.getElementById("progressPercent");
+const progressFill = document.getElementById("progressFill");
 
-dateInput.valueAsDate = new Date();
+const DRAFT_KEY = "dcrReflectionDraftV3";
+const STATS_KEY = "dcrReflectionStatsV3";
+const THEME_KEY = "dcrReflectionThemeV3";
+let deferredPrompt = null;
+let isRestoring = false;
 
-dcr.addEventListener("change", () => {
+if (!dateInput.value) {
+  dateInput.valueAsDate = new Date();
+}
+
+function buildDcrDays() {
   const maxDay = dcr.value === "30DCR" ? 30 : dcr.value === "90DCR" ? 90 : 0;
+  const previousValue = dcrDay.value;
   dcrDay.innerHTML = "";
 
   if (!maxDay) {
     dcrDay.innerHTML = '<option value="">Select DCR first</option>';
+    updateProgress();
     return;
   }
 
@@ -363,19 +532,234 @@ dcr.addEventListener("change", () => {
     option.textContent = `${i}/${maxDay}`;
     dcrDay.appendChild(option);
   }
-});
 
-paCount.addEventListener("change", () => {
+  if ([...dcrDay.options].some(option => option.value === previousValue)) {
+    dcrDay.value = previousValue;
+  }
+
+  updateProgress();
+}
+
+function updateProgress() {
+  if (!dcrDay.value || !dcr.value) {
+    progressText.textContent = "Progress: Select DCR";
+    progressPercent.textContent = "0%";
+    progressFill.style.width = "0%";
+    return;
+  }
+
+  const parts = dcrDay.value.split("/");
+  const current = Number(parts[0]);
+  const total = Number(parts[1]);
+  const percent = total ? Math.round((current / total) * 100) : 0;
+
+  progressText.textContent = `Progress: Day ${current}/${total}`;
+  progressPercent.textContent = `${percent}%`;
+  progressFill.style.width = `${percent}%`;
+}
+
+function updatePaTypesVisibility() {
   paTypesBox.classList.toggle("hidden", paCount.value === "0");
 
   if (paCount.value === "0") {
     document.querySelectorAll(".paType").forEach(cb => cb.checked = false);
   }
+}
+
+function updateExerciseOtherVisibility() {
+  otherExerciseBox.classList.toggle("hidden", !otherExerciseCheck.checked);
+
+  if (!otherExerciseCheck.checked) {
+    document.getElementById("otherExercise").value = "";
+  }
+}
+
+function updateBookOtherVisibility() {
+  otherBookBox.classList.toggle("hidden", book.value !== "Other");
+
+  if (book.value !== "Other") {
+    document.getElementById("otherBook").value = "";
+  }
+}
+
+function getStats() {
+  return JSON.parse(localStorage.getItem(STATS_KEY)) || {
+    booksCompleted: 0,
+    totalPAs: 0,
+    conversationDays: 0,
+    exerciseDays: 0
+  };
+}
+
+function saveStats(stats) {
+  localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+  renderStats();
+}
+
+function renderStats() {
+  const stats = getStats();
+  document.getElementById("totalBooks").textContent = stats.booksCompleted;
+  document.getElementById("totalPAs").textContent = stats.totalPAs;
+  document.getElementById("totalConversations").textContent = stats.conversationDays;
+  document.getElementById("totalExerciseDays").textContent = stats.exerciseDays;
+}
+
+function saveDraft() {
+  if (isRestoring) return;
+
+  const draft = {};
+  document.querySelectorAll("input, textarea, select").forEach(field => {
+    if (!field.id) return;
+    draft[field.id] = field.type === "checkbox" ? field.checked : field.value;
+  });
+
+  localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+}
+
+function restoreDraft() {
+  const savedDraft = JSON.parse(localStorage.getItem(DRAFT_KEY) || "{}");
+  isRestoring = true;
+
+  Object.keys(savedDraft).forEach(id => {
+    const field = document.getElementById(id);
+    if (!field) return;
+
+    if (field.type === "checkbox") {
+      field.checked = savedDraft[id];
+    } else {
+      field.value = savedDraft[id];
+    }
+  });
+
+  if (!dateInput.value) {
+    dateInput.valueAsDate = new Date();
+  }
+
+  buildDcrDays();
+  if (savedDraft.dcrDay) {
+    dcrDay.value = savedDraft.dcrDay;
+  }
+  updateProgress();
+  updatePaTypesVisibility();
+  updateExerciseOtherVisibility();
+  updateBookOtherVisibility();
+
+  isRestoring = false;
+}
+
+function getSelectedExercises() {
+  const selected = [...document.querySelectorAll(".exerciseType:checked")]
+    .map(cb => cb.value);
+
+  if (selected.includes("Other")) {
+    const otherText = document.getElementById("otherExercise").value.trim();
+    return selected
+      .filter(item => item !== "Other")
+      .concat(otherText ? [otherText] : ["Other"]);
+  }
+
+  return selected;
+}
+
+function applyTheme() {
+  const savedTheme = localStorage.getItem(THEME_KEY);
+  const isDark = savedTheme === "dark";
+  document.body.classList.toggle("dark", isDark);
+  darkModeBtn.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
+}
+
+function updateStatsAfterSubmit(data) {
+  const stats = getStats();
+
+  if (document.getElementById("bookCompleted").value === "Yes") {
+    stats.booksCompleted += 1;
+  }
+
+  stats.totalPAs += Number(data.paCount || 0);
+
+  if (data.conversation === "Yes") {
+    stats.conversationDays += 1;
+  }
+
+  if (data.exercise && data.exercise !== "None") {
+    stats.exerciseDays += 1;
+  }
+
+  saveStats(stats);
+}
+
+dcr.addEventListener("change", () => {
+  buildDcrDays();
+  saveDraft();
 });
 
-exercise.addEventListener("change", () => {
-  otherExerciseBox.classList.toggle("hidden", exercise.value !== "Other");
+dcrDay.addEventListener("change", () => {
+  updateProgress();
+  saveDraft();
 });
+
+paCount.addEventListener("change", () => {
+  updatePaTypesVisibility();
+  saveDraft();
+});
+
+book.addEventListener("change", () => {
+  updateBookOtherVisibility();
+  saveDraft();
+});
+
+document.querySelectorAll(".exerciseType").forEach(cb => {
+  cb.addEventListener("change", () => {
+    updateExerciseOtherVisibility();
+    saveDraft();
+  });
+});
+
+document.querySelectorAll("input, textarea, select").forEach(field => {
+  field.addEventListener("input", saveDraft);
+  field.addEventListener("change", saveDraft);
+});
+
+darkModeBtn.addEventListener("click", () => {
+  const isDark = document.body.classList.toggle("dark");
+  localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
+  darkModeBtn.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
+});
+
+resetStatsBtn.addEventListener("click", () => {
+  const confirmReset = confirm("Are you sure you want to reset all running totals?");
+  if (!confirmReset) return;
+
+  saveStats({
+    booksCompleted: 0,
+    totalPAs: 0,
+    conversationDays: 0,
+    exerciseDays: 0
+  });
+});
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.classList.remove("hidden");
+});
+
+installBtn.addEventListener("click", async () => {
+  if (!deferredPrompt) return;
+
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  installBtn.classList.add("hidden");
+});
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js").catch(err => {
+      console.log("Service worker registration failed", err);
+    });
+  });
+}
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -389,9 +773,11 @@ form.addEventListener("submit", async (e) => {
   const paTypes = [...document.querySelectorAll(".paType:checked")]
     .map(cb => cb.value);
 
-  const exerciseValue = exercise.value === "Other"
-    ? document.getElementById("otherExercise").value
-    : exercise.value;
+  const exerciseValue = getSelectedExercises().join(", ");
+
+  const bookValue = book.value === "Other"
+    ? document.getElementById("otherBook").value
+    : book.value;
 
   const data = {
     date: dateInput.value,
@@ -402,7 +788,8 @@ form.addEventListener("submit", async (e) => {
     audioTrack: document.getElementById("audioTrack").value,
     speaker: document.getElementById("speaker").value,
     listenTakeaway: document.getElementById("listenTakeaway").value,
-    book: document.getElementById("book").value,
+    book: bookValue,
+    bookCompleted: document.getElementById("bookCompleted").value,
     chapterNumber: document.getElementById("chapterNumber").value,
     chapterName: document.getElementById("chapterName").value,
     readingTakeaway: document.getElementById("readingTakeaway").value,
@@ -446,6 +833,9 @@ Chapter ${data.chapterNumber || "N/A"} - ${data.chapterName || "N/A"}
   output.textContent = result;
   output.classList.remove("hidden");
 
+  updateStatsAfterSubmit(data);
+  saveDraft();
+
   try {
     await navigator.clipboard.writeText(result);
   } catch (err) {
@@ -477,6 +867,10 @@ Chapter ${data.chapterNumber || "N/A"} - ${data.chapterName || "N/A"}
   submitBtn.disabled = false;
   submitBtn.textContent = "Submit Reflection";
 });
+
+applyTheme();
+restoreDraft();
+renderStats();
 </script>
 
 </body>
