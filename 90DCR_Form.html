@@ -52,36 +52,35 @@
 <h2>Daily Reflection Form</h2>
 
 <form id="reflectionForm">
-
-  <label for="name">Name</label>
+  <label>Name</label>
   <input type="text" id="name" required />
 
-  <label for="date">Date 📆</label>
+  <label>Date 📆</label>
   <input type="date" id="date" required />
 
-  <label for="dcr">DCR 🏃 (e.g., 9/90)</label>
+  <label>DCR 🏃</label>
   <input type="text" id="dcr" required />
 
-  <label for="used">U ✅ (Used all products you can?)</label>
+  <label>U ✅ Used Products?</label>
   <select id="used" required>
     <option value="">Select</option>
     <option value="Yes - All I could use today">Yes</option>
     <option value="No">No</option>
   </select>
 
-  <label for="listened">L 🎧 (Audio title and speakers)</label>
+  <label>L 🎧 Audio title and speakers</label>
   <input type="text" id="listened" required />
 
-  <label for="listenedTakeaway">✍️ Key Takeaways from audio</label>
+  <label>✍️ Key Takeaways from audio</label>
   <textarea id="listenedTakeaway" rows="3" required></textarea>
 
-  <label for="read">R 📖 (Book title and chapter)</label>
+  <label>R 📖 Book title and chapter</label>
   <input type="text" id="read" required />
 
-  <label for="readTakeaway">✍️ Key Takeaways from reading</label>
+  <label>✍️ Key Takeaways from reading</label>
   <textarea id="readTakeaway" rows="3" required></textarea>
 
-  <label for="associate">A 🤝 (Associate - select one)</label>
+  <label>A 🤝 Associate</label>
   <select id="associate" required>
     <option value="">Select</option>
     <option value="NA VES">NA VES</option>
@@ -90,10 +89,10 @@
     <option value="AUS VES">AUS VES</option>
   </select>
 
-  <label for="accountability">A ✅ (Accountability Message)</label>
+  <label>A ✅ Accountability Message</label>
   <textarea id="accountability" rows="2" required></textarea>
 
-  <label for="conversationInitiated">C 🗣 (Conversation initiated?)</label>
+  <label>C 🗣 Conversation initiated?</label>
   <select id="conversationInitiated" required>
     <option value="">Select</option>
     <option value="No">No</option>
@@ -101,7 +100,7 @@
   </select>
 
   <div id="conversationLogicDiv" style="display:none;">
-    <label for="conversationLogic">If Yes, what mode?</label>
+    <label>If Yes, what mode?</label>
     <select id="conversationLogic">
       <option value="">Select</option>
       <option value="Online">Online</option>
@@ -110,10 +109,10 @@
     </select>
   </div>
 
-  <label for="question">Additional Question (optional)</label>
+  <label>Additional Question optional</label>
   <textarea id="question" rows="2"></textarea>
 
-  <label for="reflections">Reflections</label>
+  <label>Reflections</label>
   <textarea id="reflections" rows="4" required></textarea>
 
   <button type="submit" id="submitBtn">Submit</button>
@@ -122,52 +121,70 @@
 <pre id="output"></pre>
 
 <script>
-  const form = document.getElementById('reflectionForm');
-  const conversationSelect = document.getElementById('conversationInitiated');
-  const conversationLogicDiv = document.getElementById('conversationLogicDiv');
-  const conversationLogicSelect = document.getElementById('conversationLogic');
-  const output = document.getElementById('output');
-  const submitBtn = document.getElementById('submitBtn');
+  const form = document.getElementById("reflectionForm");
+  const conversationSelect = document.getElementById("conversationInitiated");
+  const conversationLogicDiv = document.getElementById("conversationLogicDiv");
+  const conversationLogicSelect = document.getElementById("conversationLogic");
+  const output = document.getElementById("output");
+  const submitBtn = document.getElementById("submitBtn");
 
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxI7YYgib0Ttox7DiIsju6KHJ7pcsstYml_mCM4MpwvDpxCpGfT5Q4lZCHceeE49GE0/exec";
 
-  conversationSelect.addEventListener('change', () => {
-    if (conversationSelect.value === 'Yes') {
-      conversationLogicDiv.style.display = 'block';
+  conversationSelect.addEventListener("change", function () {
+    if (conversationSelect.value === "Yes") {
+      conversationLogicDiv.style.display = "block";
       conversationLogicSelect.required = true;
     } else {
-      conversationLogicDiv.style.display = 'none';
+      conversationLogicDiv.style.display = "none";
       conversationLogicSelect.required = false;
-      conversationLogicSelect.value = '';
+      conversationLogicSelect.value = "";
     }
   });
 
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
     submitBtn.disabled = true;
     submitBtn.textContent = "Submitting...";
 
     let convMode = conversationLogicSelect.value;
-    if (convMode === 'Both') {
-      convMode = 'Online and Offline';
+
+    if (convMode === "Both") {
+      convMode = "Online and Offline";
     }
 
+    const payload = {
+      name: document.getElementById("name").value,
+      date: document.getElementById("date").value,
+      dcr: document.getElementById("dcr").value,
+      used: document.getElementById("used").value,
+      listened: document.getElementById("listened").value,
+      listenedTakeaway: document.getElementById("listenedTakeaway").value,
+      read: document.getElementById("read").value,
+      readTakeaway: document.getElementById("readTakeaway").value,
+      associate: document.getElementById("associate").value,
+      accountability: document.getElementById("accountability").value,
+      conversation: conversationSelect.value,
+      conversationMode: convMode,
+      question: document.getElementById("question").value,
+      reflections: document.getElementById("reflections").value
+    };
+
     const result =
-`Name — ${document.getElementById('name').value}
-Date 📆 - ${document.getElementById('date').value}
-DCR 🏃 - ${document.getElementById('dcr').value}
-U ✅ - ${document.getElementById('used').value}
-L 🎧 - ${document.getElementById('listened').value}
-✍️ Key Takeaways - ${document.getElementById('listenedTakeaway').value}
-R 📖 - ${document.getElementById('read').value}
-✍️ Key Takeaways - ${document.getElementById('readTakeaway').value}
-A 🤝 - ${document.getElementById('associate').value}
-A ✅ - ${document.getElementById('accountability').value}
-C 🗣 - ${conversationSelect.value}
-${conversationSelect.value === 'Yes' ? `Logic - ${convMode}` : ''}
-Q ❓ - ${document.getElementById('question').value || 'N/A'}
-Reflections - ${document.getElementById('reflections').value}`;
+`Name — ${payload.name}
+Date 📆 - ${payload.date}
+DCR 🏃 - ${payload.dcr}
+U ✅ - ${payload.used}
+L 🎧 - ${payload.listened}
+✍️ Key Takeaways - ${payload.listenedTakeaway}
+R 📖 - ${payload.read}
+✍️ Key Takeaways - ${payload.readTakeaway}
+A 🤝 - ${payload.associate}
+A ✅ - ${payload.accountability}
+C 🗣 - ${payload.conversation}
+${payload.conversation === "Yes" ? `Logic - ${payload.conversationMode}` : ""}
+Q ❓ - ${payload.question || "N/A"}
+Reflections - ${payload.reflections}`;
 
     output.textContent = result;
 
@@ -177,46 +194,24 @@ Reflections - ${document.getElementById('reflections').value}`;
       console.log("Clipboard copy failed:", err);
     }
 
-    const payload = {
-      name: document.getElementById('name').value,
-      date: document.getElementById('date').value,
-      dcr: document.getElementById('dcr').value,
-      used: document.getElementById('used').value,
-      listened: document.getElementById('listened').value,
-      listenedTakeaway: document.getElementById('listenedTakeaway').value,
-      read: document.getElementById('read').value,
-      readTakeaway: document.getElementById('readTakeaway').value,
-      associate: document.getElementById('associate').value,
-      accountability: document.getElementById('accountability').value,
-      conversation: conversationSelect.value,
-      conversationMode: convMode,
-      question: document.getElementById('question').value,
-      reflections: document.getElementById('reflections').value
-    };
-
     try {
-      const response = await fetch(SCRIPT_URL, {
+      await fetch(SCRIPT_URL, {
         method: "POST",
+        mode: "no-cors",
         headers: {
           "Content-Type": "text/plain;charset=utf-8"
         },
         body: JSON.stringify(payload)
       });
 
-      const text = await response.text();
-      console.log("Server Response:", text);
+      alert("Submitted! Please check Telegram.");
 
-      if (text.includes('"ok":true')) {
-        alert("Submitted successfully and sent to Telegram!");
-        form.reset();
-        conversationLogicDiv.style.display = 'none';
-      } else {
-        alert("Submitted, but Telegram may have failed. Check Console response.");
-      }
+      form.reset();
+      conversationLogicDiv.style.display = "none";
 
     } catch (error) {
       console.error("Submission error:", error);
-      alert("Telegram notification failed. Check browser console.");
+      alert("Submission failed. Please check browser console.");
     }
 
     submitBtn.disabled = false;
