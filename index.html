@@ -1,361 +1,517 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daily DCR Reflection</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DCR Reflection v2.0</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      padding: 1rem;
-      max-width: 600px;
-      margin: auto;
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #f3f7fb, #e7f0ec);
+    margin: 0;
+    padding: 16px;
+    color: #222;
+  }
+
+  .app {
+    max-width: 680px;
+    margin: auto;
+  }
+
+  .hero {
+    background: white;
+    border-radius: 18px;
+    padding: 22px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    margin-bottom: 18px;
+  }
+
+  .brand {
+    font-size: 13px;
+    letter-spacing: 3px;
+    font-weight: bold;
+    color: #2f7d4f;
+  }
+
+  h1 {
+    margin: 8px 0 4px;
+    font-size: 28px;
+  }
+
+  .tagline {
+    font-size: 14px;
+    color: #666;
+  }
+
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  }
+
+  .card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+
+  label {
+    display: block;
+    font-weight: bold;
+    margin-top: 14px;
+    font-size: 14px;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    padding: 11px;
+    margin-top: 6px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-size: 15px;
+  }
+
+  textarea {
+    min-height: 80px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .pa-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .check-item {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    background: #fafafa;
+    font-weight: bold;
+  }
+
+  .check-item input {
+    width: auto;
+    margin-right: 8px;
+  }
+
+  button {
+    width: 100%;
+    border: none;
+    border-radius: 14px;
+    padding: 14px;
+    font-size: 17px;
+    font-weight: bold;
+    color: white;
+    background: #2f7d4f;
+    margin-top: 12px;
+    cursor: pointer;
+  }
+
+  button:disabled {
+    background: #999;
+  }
+
+  .output {
+    background: #111;
+    color: white;
+    border-radius: 18px;
+    padding: 22px;
+    white-space: pre-wrap;
+    text-align: center;
+    line-height: 1.5;
+    margin-top: 18px;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  @media (max-width: 520px) {
+    .row, .pa-grid {
+      grid-template-columns: 1fr;
     }
-
-    h2 { text-align: center; }
-
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 1rem;
-    }
-
-    input[type="text"], textarea, select {
-      width: 100%;
-      padding: 0.6rem;
-      margin-top: 0.3rem;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-
-    button {
-      margin-top: 1.5rem;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 0.7rem;
-      width: 100%;
-      font-size: 1rem;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    button:disabled {
-      background-color: #999;
-      cursor: not-allowed;
-    }
-
-    .output {
-      margin-top: 2rem;
-      background: #fff;
-      padding: 1rem;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      white-space: pre-wrap;
-      text-align: center;
-    }
-
-    #otherExerciseContainer,
-    #paTypeContainer {
-      display: none;
-    }
-  </style>
+  }
+</style>
 </head>
 
 <body>
+<div class="app">
 
-<h2>Daily DCR Reflection</h2>
-
-<form id="reflectionForm">
-  <label for="name">Name</label>
-  <input type="text" id="name" required />
-
-  <label for="dcr">DCR</label>
-  <select id="dcr" required>
-    <option value="">-- Select --</option>
-    <option value="30DCR">30DCR</option>
-    <option value="90DCR">90DCR</option>
-  </select>
-
-  <label for="dcrDay">Day of Core Run</label>
-  <select id="dcrDay" required>
-    <option value="">-- Select DCR First --</option>
-  </select>
-
-  <label for="u">U - Used all the products you can?</label>
-  <select id="u" required>
-    <option value="Yes - All I could use today">Yes - All I could use today</option>
-    <option value="No">No</option>
-  </select>
-
-  <label for="audioTrack">L - Audio Track</label>
-  <input type="text" id="audioTrack" />
-
-  <label for="speaker">L - Speaker</label>
-  <input type="text" id="speaker" />
-
-  <label for="listenTakeaway">L - Key Takeaways</label>
-  <textarea id="listenTakeaway" rows="3"></textarea>
-
-  <label for="book">R - Book Title</label>
-  <input type="text" id="book" />
-
-  <label for="chapterNumber">R - Chapter Number</label>
-  <input type="text" id="chapterNumber" />
-
-  <label for="chapterName">R - Chapter Name</label>
-  <input type="text" id="chapterName" />
-
-  <label for="associate">A - Associate VES</label>
-  <select id="associate">
-    <option value="NA VES">NA VES</option>
-    <option value="UK VES">UK VES</option>
-    <option value="IND VES">IND VES</option>
-    <option value="AUS VES">AUS VES</option>
-  </select>
-
-  <label for="aFollow">What’s one step you’re not willing to delay?</label>
-  <input type="text" id="aFollow" />
-
-  <label for="accountability">A - Accountability Message</label>
-  <select id="accountability">
-    <option value="This message">This message</option>
-  </select>
-
-  <label for="conversation">C - Conversations Initiated</label>
-  <select id="conversation">
-    <option value="Yes">Yes</option>
-    <option value="No">No</option>
-  </select>
-
-  <label for="mode">Mode</label>
-  <select id="mode">
-    <option value="Online">Online</option>
-    <option value="Offline">Offline</option>
-    <option value="Both">Both</option>
-  </select>
-
-  <label for="paCount">Process Appointments (PA's) Today?</label>
-  <select id="paCount">
-    <option value="">Select</option>
-    <option value="0">0</option>
-    <option value="1">1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
-    <option value="6">6</option>
-  </select>
-
-  <div id="paTypeContainer">
-    <label for="paType">Type of PA</label>
-    <select id="paType" multiple size="8">
-      <option value="MG1">MG1</option>
-      <option value="BP1">BP1</option>
-      <option value="FP1">FP1</option>
-      <option value="BP2">BP2</option>
-      <option value="FP2">FP2</option>
-      <option value="Pre-Launch">Pre-Launch</option>
-      <option value="Launch">Launch</option>
-      <option value="Post Launch">Post Launch</option>
-    </select>
+  <div class="hero">
+    <div class="brand">ALTAGRID</div>
+    <h1>DCR Reflection v2.0</h1>
+    <div class="tagline">One Day. One Decision. One Win.</div>
   </div>
 
-  <label for="journal">When you look back on today, who did you intentionally connect with?</label>
-  <input type="text" id="journal" />
+  <form id="reflectionForm">
 
-  <label for="exercise">PE - Physical Exercise</label>
-  <select id="exercise">
-    <option value="">Blank</option>
-    <option value="Run">Run</option>
-    <option value="Walk">Walk</option>
-    <option value="Swim">Swim</option>
-    <option value="Gym">Gym</option>
-    <option value="Yoga">Yoga</option>
-    <option value="Other">Other</option>
-  </select>
+    <div class="card">
+      <h3>🏃 DCR</h3>
 
-  <div id="otherExerciseContainer">
-    <label for="otherExercise">Specify Exercise</label>
-    <input type="text" id="otherExercise" />
-  </div>
+      <label>Name</label>
+      <input type="text" id="name" required />
 
-  <label for="meditation">M - Meditation</label>
-  <select id="meditation">
-    <option value="Yes">Yes</option>
-    <option value="No">No</option>
-  </select>
+      <label>Date</label>
+      <input type="date" id="date" required />
 
-  <button type="submit" id="submitBtn">Submit</button>
-</form>
+      <div class="row">
+        <div>
+          <label>DCR Type</label>
+          <select id="dcr" required>
+            <option value="">Select</option>
+            <option value="30DCR">30DCR</option>
+            <option value="90DCR">90DCR</option>
+          </select>
+        </div>
 
-<div class="output" id="output"></div>
+        <div>
+          <label>Day of Core Run</label>
+          <select id="dcrDay" required>
+            <option value="">Select DCR first</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>✅ U — Products</h3>
+      <label>Used all products you can?</label>
+      <select id="used" required>
+        <option value="Yes - All I could use today">Yes - All I could use today</option>
+        <option value="No">No</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <h3>🎧 L — Listen</h3>
+
+      <label>Audio Track</label>
+      <input type="text" id="audioTrack" />
+
+      <label>Speaker</label>
+      <input type="text" id="speaker" />
+
+      <label>Key Takeaways</label>
+      <textarea id="listenTakeaway"></textarea>
+    </div>
+
+    <div class="card">
+      <h3>📖 R — Reading</h3>
+
+      <label>Book Title</label>
+      <input type="text" id="book" />
+
+      <div class="row">
+        <div>
+          <label>Chapter Number</label>
+          <input type="text" id="chapterNumber" />
+        </div>
+
+        <div>
+          <label>Chapter Name</label>
+          <input type="text" id="chapterName" />
+        </div>
+      </div>
+
+      <label>Reading Takeaways</label>
+      <textarea id="readingTakeaway"></textarea>
+    </div>
+
+    <div class="card">
+      <h3>🤝 A — Associate</h3>
+
+      <label>Associate VES</label>
+      <select id="associate">
+        <option value="NA VES">NA VES</option>
+        <option value="UK VES">UK VES</option>
+        <option value="IND VES">IND VES</option>
+        <option value="AUS VES">AUS VES</option>
+      </select>
+
+      <label>What’s one step you’re not willing to delay?</label>
+      <input type="text" id="aFollow" />
+
+      <label>Accountability Message</label>
+      <select id="accountability">
+        <option value="This message">This message</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <h3>🗣 Conversations</h3>
+
+      <label>Conversations Initiated?</label>
+      <select id="conversation">
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+
+      <label>Mode</label>
+      <select id="mode">
+        <option value="Online">Online</option>
+        <option value="Offline">Offline</option>
+        <option value="Both">Both</option>
+      </select>
+
+      <label>Process Appointments PA's Today?</label>
+      <select id="paCount">
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+      </select>
+
+      <div id="paTypesBox" class="hidden">
+        <label>Type of PA</label>
+        <div class="pa-grid">
+          <label class="check-item"><input type="checkbox" value="MG1" class="paType"> MG1</label>
+          <label class="check-item"><input type="checkbox" value="BP1" class="paType"> BP1</label>
+          <label class="check-item"><input type="checkbox" value="FP1" class="paType"> FP1</label>
+          <label class="check-item"><input type="checkbox" value="BP2" class="paType"> BP2</label>
+          <label class="check-item"><input type="checkbox" value="FP2" class="paType"> FP2</label>
+          <label class="check-item"><input type="checkbox" value="Pre-Launch" class="paType"> Pre-Launch</label>
+          <label class="check-item"><input type="checkbox" value="Launch" class="paType"> Launch</label>
+          <label class="check-item"><input type="checkbox" value="Post Launch" class="paType"> Post Launch</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🏃 Physical + 🧘 Meditation</h3>
+
+      <label>Physical Exercise</label>
+      <select id="exercise">
+        <option value="">Blank</option>
+        <option value="Run">Run</option>
+        <option value="Walk">Walk</option>
+        <option value="Swim">Swim</option>
+        <option value="Gym">Gym</option>
+        <option value="Yoga">Yoga</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <div id="otherExerciseBox" class="hidden">
+        <label>Specify Exercise</label>
+        <input type="text" id="otherExercise" />
+      </div>
+
+      <label>Meditation</label>
+      <select id="meditation">
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <h3>💭 Reflection</h3>
+
+      <label>When you look back on today, who did you intentionally connect with?</label>
+      <textarea id="journal"></textarea>
+    </div>
+
+    <button type="submit" id="submitBtn">Submit Reflection</button>
+  </form>
+
+  <div class="output hidden" id="output"></div>
+
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxI7YYgib0Ttox7DiIsju6KHJ7pcsstYml_mCM4MpwvDpxCpGfT5Q4lZCHceeE49GE0/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxI7YYgib0Ttox7DiIsju6KHJ7pcsstYml_mCM4MpwvDpxCpGfT5Q4lZCHceeE49GE0/exec";
 
-  const form = document.getElementById("reflectionForm");
-  const dcr = document.getElementById("dcr");
-  const dcrDay = document.getElementById("dcrDay");
-  const exercise = document.getElementById("exercise");
-  const otherExerciseContainer = document.getElementById("otherExerciseContainer");
-  const paCount = document.getElementById("paCount");
-  const paTypeContainer = document.getElementById("paTypeContainer");
-  const paType = document.getElementById("paType");
-  const output = document.getElementById("output");
-  const submitBtn = document.getElementById("submitBtn");
+const form = document.getElementById("reflectionForm");
+const dcr = document.getElementById("dcr");
+const dcrDay = document.getElementById("dcrDay");
+const dateInput = document.getElementById("date");
+const paCount = document.getElementById("paCount");
+const paTypesBox = document.getElementById("paTypesBox");
+const exercise = document.getElementById("exercise");
+const otherExerciseBox = document.getElementById("otherExerciseBox");
+const output = document.getElementById("output");
+const submitBtn = document.getElementById("submitBtn");
 
-  dcr.addEventListener("change", () => {
-    const maxDay = dcr.value === "30DCR" ? 30 : dcr.value === "90DCR" ? 90 : 0;
-    dcrDay.innerHTML = "";
+dateInput.valueAsDate = new Date();
 
-    if (maxDay === 0) {
-      dcrDay.innerHTML = '<option value="">-- Select DCR First --</option>';
-      return;
-    }
+dcr.addEventListener("change", () => {
+  const maxDay = dcr.value === "30DCR" ? 30 : dcr.value === "90DCR" ? 90 : 0;
+  dcrDay.innerHTML = "";
 
-    for (let i = 1; i <= maxDay; i++) {
-      const option = document.createElement("option");
-      option.value = `${i}/${maxDay}`;
-      option.textContent = `${i}/${maxDay}`;
-      dcrDay.appendChild(option);
-    }
-  });
+  if (!maxDay) {
+    dcrDay.innerHTML = '<option value="">Select DCR first</option>';
+    return;
+  }
 
-  exercise.addEventListener("change", () => {
-    otherExerciseContainer.style.display = exercise.value === "Other" ? "block" : "none";
-  });
+  for (let i = 1; i <= maxDay; i++) {
+    const option = document.createElement("option");
+    option.value = `${i}/${maxDay}`;
+    option.textContent = `${i}/${maxDay}`;
+    dcrDay.appendChild(option);
+  }
+});
 
-  paCount.addEventListener("change", () => {
-    if (paCount.value && paCount.value !== "0") {
-      paTypeContainer.style.display = "block";
-    } else {
-      paTypeContainer.style.display = "none";
-      [...paType.options].forEach(option => option.selected = false);
-    }
-  });
+paCount.addEventListener("change", () => {
+  paTypesBox.classList.toggle("hidden", paCount.value === "0");
 
-  form.addEventListener("submit", async function(e) {
-    e.preventDefault();
+  if (paCount.value === "0") {
+    document.querySelectorAll(".paType").forEach(cb => cb.checked = false);
+  }
+});
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Submitting...";
+exercise.addEventListener("change", () => {
+  otherExerciseBox.classList.toggle("hidden", exercise.value !== "Other");
+});
 
-    const name = document.getElementById("name").value;
-    const dcrValue = dcr.value;
-    const dcrDayValue = dcrDay.value;
-    const u = document.getElementById("u").value;
-    const audio = document.getElementById("audioTrack").value;
-    const speaker = document.getElementById("speaker").value;
-    const listenTakeaway = document.getElementById("listenTakeaway").value;
-    const book = document.getElementById("book").value;
-    const chapterNumber = document.getElementById("chapterNumber").value;
-    const chapterName = document.getElementById("chapterName").value;
-    const associate = document.getElementById("associate").value;
-    const aFollow = document.getElementById("aFollow").value;
-    const accountability = document.getElementById("accountability").value;
-    const conversation = document.getElementById("conversation").value;
-    const modeRaw = document.getElementById("mode").value;
-    const mode = modeRaw === "Both" ? "Online and Offline" : modeRaw;
-    const paCountValue = paCount.value || "0";
-    const paTypes = [...paType.selectedOptions].map(option => option.value);
-    const paTypesText = paTypes.length ? paTypes.join(", ") : "N/A";
-    const journal = document.getElementById("journal").value;
-    const exerciseVal = exercise.value === "Other"
-      ? document.getElementById("otherExercise").value
-      : exercise.value;
-    const meditation = document.getElementById("meditation").value;
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    const result =
-`**${name} ${dcrValue} - ${dcrDayValue}**
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Submitting...";
 
-**U:** ${u}
-**L:** ${audio} - ${speaker}
-${listenTakeaway}
+  const modeRaw = document.getElementById("mode").value;
+  const mode = modeRaw === "Both" ? "Online and Offline" : modeRaw;
 
-**R:** ${book} - Chapter ${chapterNumber} - ${chapterName}
+  const paTypes = [...document.querySelectorAll(".paType:checked")]
+    .map(cb => cb.value);
 
-**A:** ${associate}
-**Key Step:** ${aFollow}
+  const exerciseValue = exercise.value === "Other"
+    ? document.getElementById("otherExercise").value
+    : exercise.value;
 
-**A:** ${accountability}
+  const data = {
+    date: dateInput.value,
+    name: document.getElementById("name").value,
+    dcr: dcr.value,
+    dcrDay: dcrDay.value,
+    used: document.getElementById("used").value,
+    audioTrack: document.getElementById("audioTrack").value,
+    speaker: document.getElementById("speaker").value,
+    listenTakeaway: document.getElementById("listenTakeaway").value,
+    book: document.getElementById("book").value,
+    chapterNumber: document.getElementById("chapterNumber").value,
+    chapterName: document.getElementById("chapterName").value,
+    readingTakeaway: document.getElementById("readingTakeaway").value,
+    associate: document.getElementById("associate").value,
+    aFollow: document.getElementById("aFollow").value,
+    accountability: document.getElementById("accountability").value,
+    conversation: document.getElementById("conversation").value,
+    mode,
+    paCount: paCount.value,
+    paTypes: paTypes.join(", ") || "N/A",
+    exercise: exerciseValue || "None",
+    meditation: document.getElementById("meditation").value,
+    journal: document.getElementById("journal").value
+  };
 
-**C:** ${conversation}
-Mode: ${mode}
-**PA's:** ${paCountValue}, Type of PA: ${paTypesText}
+  const result =
+`ALTAGRID
+Daily Reflection
 
-**PE:** 🏃 ${exerciseVal || "None"}
-**M:** 🧘 ${meditation}
+━━━━━━━━━━━━━━━━━━
 
-**Journal:** ${journal}`;
+🏃 ${data.name}
+${data.dcr} • Day ${data.dcrDay}
+📅 ${data.date}
 
-    output.textContent = result;
+━━━━━━━━━━━━━━━━━━
 
-    try {
-      await navigator.clipboard.writeText(result);
-    } catch (err) {
-      console.log("Clipboard copy failed:", err);
-    }
+✅ Used Products
+${data.used}
 
-    const payload = {
-      name,
-      dcr: dcrValue,
-      dcrDay: dcrDayValue,
-      used: u,
-      audioTrack: audio,
-      speaker,
-      listenTakeaway,
-      book,
-      chapterNumber,
-      chapterName,
-      associate,
-      aFollow,
-      accountability,
-      conversation,
-      mode,
-      paCount: paCountValue,
-      paTypes: paTypesText,
-      journal,
-      exercise: exerciseVal || "None",
-      meditation,
-      fullOutput: result
-    };
+🎧 Listen
+${data.audioTrack || "N/A"}
+${data.speaker || ""}
 
-    try {
-      await fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: JSON.stringify(payload)
+📝 Key Takeaways
+${data.listenTakeaway || "N/A"}
+
+📖 Reading
+${data.book || "N/A"}
+Chapter ${data.chapterNumber || "N/A"} - ${data.chapterName || "N/A"}
+
+📝 Reading Takeaways
+${data.readingTakeaway || "N/A"}
+
+🤝 Associate
+${data.associate}
+
+🎯 One Step
+${data.aFollow || "N/A"}
+
+🗣 Conversations
+${data.conversation} (${data.mode})
+
+📅 PA's Today
+${data.paCount}
+
+📋 Types
+${data.paTypes}
+
+🏃 Physical Exercise
+${data.exercise}
+
+🧘 Meditation
+${data.meditation}
+
+💭 Reflection
+${data.journal || "N/A"}
+
+━━━━━━━━━━━━━━━━━━
+
+Keep Going.
+One Day. One Decision. One Win.`;
+
+  data.fullOutput = result;
+
+  output.textContent = result;
+  output.classList.remove("hidden");
+
+  try {
+    await navigator.clipboard.writeText(result);
+  } catch (err) {
+    console.log("Clipboard failed", err);
+  }
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify(data)
+    });
+
+    if (["30/30", "60/90", "90/90"].includes(data.dcrDay)) {
+      confetti({
+        particleCount: 220,
+        spread: 100,
+        origin: { y: 0.6 }
       });
-
-      alert("Submitted! Output copied and sent to Telegram.");
-
-      if (["30/30", "60/90", "90/90"].includes(dcrDayValue)) {
-        confetti({
-          particleCount: 180,
-          spread: 90,
-          origin: { y: 0.6 }
-        });
-      }
-
-      form.reset();
-      dcrDay.innerHTML = '<option value="">-- Select DCR First --</option>';
-      otherExerciseContainer.style.display = "none";
-      paTypeContainer.style.display = "none";
-
-    } catch (error) {
-      console.error("Submission error:", error);
-      alert("Submission failed. Please check browser console.");
     }
 
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Submit";
-  });
+    alert("Submitted! Copied and sent to Telegram.");
+
+  } catch (error) {
+    console.error(error);
+    alert("Submission failed. Check console.");
+  }
+
+  submitBtn.disabled = false;
+  submitBtn.textContent = "Submit Reflection";
+});
 </script>
 
 </body>
