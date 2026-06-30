@@ -52,6 +52,7 @@
 <h2>Daily Reflection Form</h2>
 
 <form id="reflectionForm">
+
   <label for="name">Name</label>
   <input type="text" id="name" required />
 
@@ -115,7 +116,7 @@
   <label for="reflections">Reflections</label>
   <textarea id="reflections" rows="4" required></textarea>
 
-  <button type="submit">Submit</button>
+  <button type="submit" id="submitBtn">Submit</button>
 </form>
 
 <pre id="output"></pre>
@@ -126,16 +127,17 @@
   const conversationLogicDiv = document.getElementById('conversationLogicDiv');
   const conversationLogicSelect = document.getElementById('conversationLogic');
   const output = document.getElementById('output');
+  const submitBtn = document.getElementById('submitBtn');
 
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxI7YYgib0Ttox7DiIsju6KHJ7pcsstYml_mCM4MpwvDpxCpGfT5Q4lZCHceeE49GE0/exec";
 
   conversationSelect.addEventListener('change', () => {
     if (conversationSelect.value === 'Yes') {
       conversationLogicDiv.style.display = 'block';
-      conversationLogicSelect.setAttribute('required', 'required');
+      conversationLogicSelect.required = true;
     } else {
       conversationLogicDiv.style.display = 'none';
-      conversationLogicSelect.removeAttribute('required');
+      conversationLogicSelect.required = false;
       conversationLogicSelect.value = '';
     }
   });
@@ -143,8 +145,13 @@
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting...";
+
     let convMode = conversationLogicSelect.value;
-    if (convMode === 'Both') convMode = 'Online and Offline';
+    if (convMode === 'Both') {
+      convMode = 'Online and Offline';
+    }
 
     const result =
 `Name — ${document.getElementById('name').value}
@@ -199,15 +206,21 @@ Reflections - ${document.getElementById('reflections').value}`;
       const text = await response.text();
       console.log("Server Response:", text);
 
-      alert("Submitted successfully and sent to Telegram!");
-
-      form.reset();
-      conversationLogicDiv.style.display = 'none';
+      if (text.includes('"ok":true')) {
+        alert("Submitted successfully and sent to Telegram!");
+        form.reset();
+        conversationLogicDiv.style.display = 'none';
+      } else {
+        alert("Submitted, but Telegram may have failed. Check Console response.");
+      }
 
     } catch (error) {
       console.error("Submission error:", error);
-      alert("Form submitted locally, but Telegram notification failed.");
+      alert("Telegram notification failed. Check browser console.");
     }
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit";
   });
 </script>
 
