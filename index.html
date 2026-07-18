@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#2f7d4f" />
-<title>DCR Growth System v5</title>
+<title>DCR Growth Platform v7</title>
 <link rel="manifest" href="manifest.json" />
 
 <style>
@@ -240,6 +240,55 @@
     border: 1px solid var(--border);
   }
 
+
+  .management-toolbar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: end;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    margin-top: 14px;
+  }
+
+  .metrics-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 780px;
+  }
+
+  .metrics-table th,
+  .metrics-table td {
+    padding: 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    font-size: 13px;
+    vertical-align: top;
+  }
+
+  .metrics-table th {
+    background: var(--soft);
+    position: sticky;
+    top: 0;
+  }
+
+  .role-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: var(--soft);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .mini-text {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
   .profile-line {
     margin: 8px 0;
     word-break: break-word;
@@ -263,8 +312,11 @@
 
   <div class="hero">
     <div class="brand">α Team</div>
-    <h1>DCR Growth System</h1>
+    <h1>DCR Growth Platform</h1>
     <div class="tagline">You do not rise to the level of your goals; you fall to the level of your systems..</div>
+    <div class="mini-text" style="margin-top:8px;">
+      Firestore stores metrics only. Detailed reflection content is sent through your existing Telegram workflow.
+    </div>
     <div class="toolbar">
       <button type="button" id="darkModeBtn">🌙 Dark Mode</button>
       <button type="button" id="installBtn" class="secondary-btn hidden">📱 Install App</button>
@@ -283,7 +335,54 @@
     <p class="profile-line"><strong>Name:</strong> <span id="signedInName"></span></p>
     <p class="profile-line"><strong>Email:</strong> <span id="signedInEmail"></span></p>
     <p class="profile-line"><strong>Member ID:</strong> <span id="memberIdDisplay"></span></p>
+    <p class="profile-line"><strong>Role:</strong> <span id="profileRoleDisplay"></span></p>
+    <p class="profile-line"><strong>Selected Leader:</strong> <span id="profileLeaderDisplay"></span></p>
     <button type="button" id="logoutBtn" class="danger-btn">Sign Out</button>
+  </div>
+
+  <div class="card hidden" id="leaderSelectionCard">
+    <h3>🤝 Select Your Leader</h3>
+    <p>
+      This is required only the first time you sign in. Your selection will
+      be saved to your profile.
+    </p>
+
+    <label>Your Leader</label>
+    <select id="leaderSelect" required>
+      <option value="">Select your leader</option>
+      <option value="alwaysprav2003@gmail.com">
+        Praveen &amp; Vasavi Ponugoti
+      </option>
+      <option value="vidyadhart@gmail.com">
+        Vidya &amp; Rama Tatipamula
+      </option>
+      <option value="vinay@atyam.com">
+        Vinay &amp; Veni Atyam
+      </option>
+      <option value="ponugotibiz@gmail.com">
+        Prashanth &amp; Kalyani Ponugoti
+      </option>
+    </select>
+
+    <button type="button" id="saveLeaderBtn">
+      Save My Leader
+    </button>
+
+    <div id="leaderSelectionStatus" class="auth-status">
+      Please select the leader you are currently working with.
+    </div>
+  </div>
+
+  <div class="card hidden" id="roleCard">
+    <h3>🛡️ Account Access</h3>
+    <p class="profile-line">
+      <strong>Role:</strong>
+      <span id="roleDisplay">Member</span>
+    </p>
+    <p class="profile-line">
+      <strong>Leader:</strong>
+      <span id="selectedLeaderDisplay">Not selected</span>
+    </p>
   </div>
 
   <div class="card hidden" id="statsCard">
@@ -350,6 +449,81 @@
     </div>
 
     <div id="historyStatus" class="auth-status">Sign in to load your history.</div>
+  </div>
+
+  <div class="card hidden" id="managementDashboard">
+    <h3 id="managementTitle">📊 Team Dashboard</h3>
+
+    <div class="management-toolbar">
+      <div>
+        <label>Reporting Month</label>
+        <input type="month" id="managementMonth" />
+      </div>
+      <button type="button" id="loadManagementBtn">Load Metrics</button>
+    </div>
+
+    <div class="stats-grid" style="margin-top:14px;">
+      <div class="stat-box">
+        <div class="stat-number" id="managementMembers">0</div>
+        <div class="stat-label">Members</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number" id="managementBooks">0</div>
+        <div class="stat-label">Books Completed</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number" id="managementAppointments">0</div>
+        <div class="stat-label">Appointments</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number" id="managementWorkout">0</div>
+        <div class="stat-label">Workout Days</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number" id="managementMeditation">0</div>
+        <div class="stat-label">Meditation Days</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number" id="managementDcr">0</div>
+        <div class="stat-label">DCR Days</div>
+      </div>
+    </div>
+
+    <div class="card" style="box-shadow:none; border:1px solid var(--border); margin-top:14px;">
+      <h3>📋 Appointment Types</h3>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-number" id="mgmtMG1">0</div><div class="stat-label">MG1</div></div>
+        <div class="stat-box"><div class="stat-number" id="mgmtBP1">0</div><div class="stat-label">BP1</div></div>
+        <div class="stat-box"><div class="stat-number" id="mgmtFP1">0</div><div class="stat-label">FP1</div></div>
+        <div class="stat-box"><div class="stat-number" id="mgmtBP2">0</div><div class="stat-label">BP2</div></div>
+        <div class="stat-box"><div class="stat-number" id="mgmtFP2">0</div><div class="stat-label">FP2</div></div>
+        <div class="stat-box"><div class="stat-number" id="mgmtPreLaunch">0</div><div class="stat-label">Pre-Launch</div></div>
+        <div class="stat-box"><div class="stat-number" id="mgmtLaunch">0</div><div class="stat-label">Launch</div></div>
+        <div class="stat-box"><div class="stat-number" id="mgmtPostLaunch">0</div><div class="stat-label">Post Launch</div></div>
+      </div>
+    </div>
+
+    <div id="managementStatus" class="auth-status">
+      Select a month and load the dashboard.
+    </div>
+
+    <div class="table-wrap">
+      <table class="metrics-table">
+        <thead>
+          <tr>
+            <th>Member</th>
+            <th>Leader</th>
+            <th>DCR</th>
+            <th>Books</th>
+            <th>Appointments</th>
+            <th>Workout</th>
+            <th>Meditation</th>
+            <th>Appointment Types</th>
+          </tr>
+        </thead>
+        <tbody id="managementMemberRows"></tbody>
+      </table>
+    </div>
   </div>
 
   <form id="reflectionForm" class="hidden">
@@ -606,6 +780,67 @@ const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
 const googleProvider = new GoogleAuthProvider();
 
+const LEADERS = [
+  {
+    name: "Praveen & Vasavi Ponugoti",
+    email: "alwaysprav2003@gmail.com"
+  },
+  {
+    name: "Vidya & Rama Tatipamula",
+    email: "vidyadhart@gmail.com"
+  },
+  {
+    name: "Vinay & Veni Atyam",
+    email: "vinay@atyam.com"
+  },
+  {
+    name: "Prashanth & Kalyani Ponugoti",
+    email: "ponugotibiz@gmail.com"
+  }
+];
+
+const OWNER_EMAILS = new Set([
+  "ponugotibiz@gmail.com"
+]);
+
+const ADMIN_EMAILS = new Set([
+  "vidyadhart@gmail.com"
+]);
+
+const LEADER_EMAILS = new Set(
+  LEADERS.map(leader => leader.email.toLowerCase())
+);
+
+function normalizeEmail(email) {
+  return String(email || "").trim().toLowerCase();
+}
+
+function determineRole(email) {
+  const normalizedEmail = normalizeEmail(email);
+
+  if (OWNER_EMAILS.has(normalizedEmail)) {
+    return "owner";
+  }
+
+  if (ADMIN_EMAILS.has(normalizedEmail)) {
+    return "admin";
+  }
+
+  if (LEADER_EMAILS.has(normalizedEmail)) {
+    return "leader";
+  }
+
+  return "member";
+}
+
+function findLeaderByEmail(email) {
+  const normalizedEmail = normalizeEmail(email);
+
+  return LEADERS.find(
+    leader => normalizeEmail(leader.email) === normalizedEmail
+  ) || null;
+}
+
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxI7YYgib0Ttox7DiIsju6KHJ7pcsstYml_mCM4MpwvDpxCpGfT5Q4lZCHceeE49GE0/exec";
 
 const form = document.getElementById("reflectionForm");
@@ -636,6 +871,21 @@ const signedInEmail = document.getElementById("signedInEmail");
 const memberIdDisplay = document.getElementById("memberIdDisplay");
 const authMessage = document.getElementById("authMessage");
 const historyStatus = document.getElementById("historyStatus");
+const leaderSelectionCard = document.getElementById("leaderSelectionCard");
+const leaderSelect = document.getElementById("leaderSelect");
+const saveLeaderBtn = document.getElementById("saveLeaderBtn");
+const leaderSelectionStatus = document.getElementById("leaderSelectionStatus");
+const roleCard = document.getElementById("roleCard");
+const roleDisplay = document.getElementById("roleDisplay");
+const selectedLeaderDisplay = document.getElementById("selectedLeaderDisplay");
+const profileRoleDisplay = document.getElementById("profileRoleDisplay");
+const profileLeaderDisplay = document.getElementById("profileLeaderDisplay");
+const managementDashboard = document.getElementById("managementDashboard");
+const managementTitle = document.getElementById("managementTitle");
+const managementMonth = document.getElementById("managementMonth");
+const loadManagementBtn = document.getElementById("loadManagementBtn");
+const managementStatus = document.getElementById("managementStatus");
+const managementMemberRows = document.getElementById("managementMemberRows");
 const summaryPeriod = document.getElementById("summaryPeriod");
 const summaryMonth = document.getElementById("summaryMonth");
 const summaryYear = document.getElementById("summaryYear");
@@ -649,6 +899,8 @@ let deferredPrompt = null;
 let isRestoring = false;
 let currentUser = null;
 let currentMemberId = "";
+let currentUserRole = "member";
+let currentUserProfile = null;
 let userHistory = [];
 
 function getLocalDateString(date = new Date()) {
@@ -1023,10 +1275,21 @@ async function saveDailySubmissionAndSummaries(data) {
     );
 
     transaction.set(submissionRef, {
-      ...data,
+      date: data.date,
+      dcr: data.dcr,
+      dcrDay: data.dcrDay,
+      book: data.book || "",
+      bookCompleted: data.bookCompleted,
+      appointments: Number(data.paCount || 0),
+      appointmentTypes: data.paTypesArray || [],
+      conversationCount: Number(data.conversationCount || 0),
+      workoutCompleted: Boolean(data.exercise && data.exercise !== "None"),
+      meditationCompleted: data.meditation === "Yes",
+      role: currentUserRole,
+      leaderEmail: currentUserProfile?.leaderEmail || "",
+      leaderName: currentUserProfile?.leaderName || "",
       uid: currentUser.uid,
       memberId: currentMemberId,
-      userEmail: currentUser.email || "",
       createdAt: serverTimestamp()
     });
 
@@ -1042,15 +1305,124 @@ function calculateStats(history) {
 
 async function saveUserProfile(user) {
   const profileRef = doc(db, "users", user.uid);
+  const profileSnapshot = await getDoc(profileRef);
+  const calculatedRole = determineRole(user.email);
 
-  await setDoc(profileRef, {
-    uid: user.uid,
-    memberId: createMemberId(user.uid),
-    name: user.displayName || "",
-    email: user.email || "",
-    photoURL: user.photoURL || "",
-    updatedAt: serverTimestamp()
-  }, { merge: true });
+  if (profileSnapshot.exists()) {
+    const existing = profileSnapshot.data();
+    const protectedRole =
+      calculatedRole === "admin" || calculatedRole === "leader"
+        ? calculatedRole
+        : existing.role || "member";
+
+    await setDoc(profileRef, {
+      uid: user.uid,
+      memberId: existing.memberId || createMemberId(user.uid),
+      name: user.displayName || existing.name || "",
+      email: normalizeEmail(user.email),
+      photoURL: user.photoURL || existing.photoURL || "",
+      role: protectedRole,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+  } else {
+    await setDoc(profileRef, {
+      uid: user.uid,
+      memberId: createMemberId(user.uid),
+      name: user.displayName || "",
+      email: normalizeEmail(user.email),
+      photoURL: user.photoURL || "",
+      role: calculatedRole,
+      leaderEmail: "",
+      leaderName: "",
+      leaderSelectedAt: null,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+  }
+
+  const refreshedSnapshot = await getDoc(profileRef);
+  return refreshedSnapshot.data();
+}
+
+function showLeaderSelection(profile) {
+  const hasLeader = Boolean(
+    profile &&
+    profile.leaderEmail &&
+    profile.leaderName
+  );
+
+  if (hasLeader) {
+    leaderSelectionCard.classList.add("hidden");
+    roleCard.classList.remove("hidden");
+    form.classList.remove("hidden");
+    statsCard.classList.remove("hidden");
+
+    selectedLeaderDisplay.textContent = profile.leaderName;
+    profileLeaderDisplay.textContent = profile.leaderName;
+    return true;
+  }
+
+  leaderSelectionCard.classList.remove("hidden");
+  roleCard.classList.remove("hidden");
+  form.classList.add("hidden");
+  statsCard.classList.add("hidden");
+
+  selectedLeaderDisplay.textContent = "Not selected";
+  profileLeaderDisplay.textContent = "Not selected";
+  return false;
+}
+
+async function saveSelectedLeader() {
+  if (!currentUser) {
+    alert("Please sign in first.");
+    return;
+  }
+
+  const selectedEmail = normalizeEmail(leaderSelect.value);
+  const selectedLeader = findLeaderByEmail(selectedEmail);
+
+  if (!selectedLeader) {
+    leaderSelectionStatus.textContent =
+      "Please select one of the available leaders.";
+    return;
+  }
+
+  saveLeaderBtn.disabled = true;
+  saveLeaderBtn.textContent = "Saving...";
+  leaderSelectionStatus.textContent = "Saving your leader selection...";
+
+  try {
+    const profileRef = doc(db, "users", currentUser.uid);
+
+    await setDoc(profileRef, {
+      leaderEmail: selectedLeader.email,
+      leaderName: selectedLeader.name,
+      leaderSelectedAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
+    const refreshed = await getDoc(profileRef);
+    currentUserProfile = refreshed.data();
+
+    selectedLeaderDisplay.textContent = selectedLeader.name;
+    profileLeaderDisplay.textContent = selectedLeader.name;
+    leaderSelectionStatus.textContent =
+      `${selectedLeader.name} has been saved as your leader.`;
+
+    leaderSelectionCard.classList.add("hidden");
+    statsCard.classList.remove("hidden");
+    form.classList.remove("hidden");
+
+    await loadSelectedSummary();
+    await updateDailySubmissionStatus();
+  } catch (error) {
+    console.error("Leader selection failed:", error);
+    leaderSelectionStatus.textContent =
+      "Could not save your leader. Check Firestore rules and try again.";
+  } finally {
+    saveLeaderBtn.disabled = false;
+    saveLeaderBtn.textContent = "Save My Leader";
+  }
 }
 
 async function hasSubmittedToday() {
@@ -1115,6 +1487,167 @@ async function loadUserHistory() {
   }
 }
 
+
+function roleCanManage(role) {
+  return ["leader", "admin", "owner"].includes(role);
+}
+
+function memberIsVisibleToCurrentUser(profile) {
+  if (!profile) return false;
+
+  if (currentUserRole === "owner" || currentUserRole === "admin") {
+    return true;
+  }
+
+  if (currentUserRole === "leader") {
+    return normalizeEmail(profile.leaderEmail) === normalizeEmail(currentUser.email);
+  }
+
+  return false;
+}
+
+function appointmentTypeText(types = {}) {
+  const normalized = {
+    ...emptyAppointmentTypes(),
+    ...(types || {})
+  };
+
+  return Object.entries(normalized)
+    .filter(([, value]) => Number(value || 0) > 0)
+    .map(([key, value]) => `${key}: ${value}`)
+    .join(", ") || "None";
+}
+
+function renderManagementTotals(total) {
+  document.getElementById("managementMembers").textContent = total.members;
+  document.getElementById("managementBooks").textContent = total.booksCompleted;
+  document.getElementById("managementAppointments").textContent = total.appointments;
+  document.getElementById("managementWorkout").textContent = total.workoutDays;
+  document.getElementById("managementMeditation").textContent = total.meditationDays;
+  document.getElementById("managementDcr").textContent = total.dcrDays;
+
+  document.getElementById("mgmtMG1").textContent = total.appointmentTypes.MG1;
+  document.getElementById("mgmtBP1").textContent = total.appointmentTypes.BP1;
+  document.getElementById("mgmtFP1").textContent = total.appointmentTypes.FP1;
+  document.getElementById("mgmtBP2").textContent = total.appointmentTypes.BP2;
+  document.getElementById("mgmtFP2").textContent = total.appointmentTypes.FP2;
+  document.getElementById("mgmtPreLaunch").textContent = total.appointmentTypes["Pre-Launch"];
+  document.getElementById("mgmtLaunch").textContent = total.appointmentTypes.Launch;
+  document.getElementById("mgmtPostLaunch").textContent = total.appointmentTypes["Post Launch"];
+}
+
+function renderManagementRows(rows) {
+  managementMemberRows.innerHTML = "";
+
+  if (!rows.length) {
+    managementMemberRows.innerHTML =
+      '<tr><td colspan="8">No members found for this view.</td></tr>';
+    return;
+  }
+
+  rows
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .forEach(row => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>
+          <strong>${row.name}</strong><br>
+          <span class="mini-text">${row.memberId || ""}</span><br>
+          <span class="role-badge">${row.role}</span>
+        </td>
+        <td>${row.leaderName || "Not selected"}</td>
+        <td>${row.summary.dcrDays}</td>
+        <td>${row.summary.booksCompleted}</td>
+        <td>${row.summary.appointments}</td>
+        <td>${row.summary.workoutDays}</td>
+        <td>${row.summary.meditationDays}</td>
+        <td>${appointmentTypeText(row.summary.appointmentTypes)}</td>
+      `;
+      managementMemberRows.appendChild(tr);
+    });
+}
+
+async function loadManagementMetrics() {
+  if (!currentUser || !roleCanManage(currentUserRole)) {
+    alert("You do not have permission to view this dashboard.");
+    return;
+  }
+
+  const monthKey = managementMonth.value || getMonthKey();
+  managementStatus.textContent = `Loading metrics for ${monthKey}...`;
+  loadManagementBtn.disabled = true;
+
+  try {
+    const usersSnapshot = await getDocs(collection(db, "users"));
+    const visibleProfiles = usersSnapshot.docs
+      .map(item => ({ uid: item.id, ...item.data() }))
+      .filter(profile => memberIsVisibleToCurrentUser(profile));
+
+    const rows = [];
+    const total = {
+      members: 0,
+      booksCompleted: 0,
+      appointments: 0,
+      workoutDays: 0,
+      meditationDays: 0,
+      dcrDays: 0,
+      appointmentTypes: emptyAppointmentTypes()
+    };
+
+    for (const profile of visibleProfiles) {
+      const summaryRef = doc(
+        db,
+        "users",
+        profile.uid,
+        "monthlySummaries",
+        monthKey
+      );
+
+      const summarySnapshot = await getDoc(summaryRef);
+      const summary = normalizeSummary(
+        summarySnapshot.exists() ? summarySnapshot.data() : {}
+      );
+
+      total.members += 1;
+      total.booksCompleted += summary.booksCompleted;
+      total.appointments += summary.appointments;
+      total.workoutDays += summary.workoutDays;
+      total.meditationDays += summary.meditationDays;
+      total.dcrDays += summary.dcrDays;
+
+      Object.keys(total.appointmentTypes).forEach(type => {
+        total.appointmentTypes[type] += Number(
+          summary.appointmentTypes[type] || 0
+        );
+      });
+
+      rows.push({
+        name: profile.name || profile.email || "Unnamed Member",
+        memberId: profile.memberId || "",
+        role: profile.role || "member",
+        leaderName: profile.leaderName || "",
+        summary
+      });
+    }
+
+    renderManagementTotals(total);
+    renderManagementRows(rows);
+
+    managementStatus.textContent =
+      `Loaded ${total.members} member profile${total.members === 1 ? "" : "s"} for ${monthKey}.`;
+  } catch (error) {
+    console.error("Management dashboard failed:", error);
+    managementStatus.textContent =
+      "Unable to load metrics. Verify Firestore rules and role assignments.";
+  } finally {
+    loadManagementBtn.disabled = false;
+  }
+}
+
+loadManagementBtn.addEventListener("click", loadManagementMetrics);
+
+saveLeaderBtn.addEventListener("click", saveSelectedLeader);
+
 googleLoginBtn.addEventListener("click", async () => {
   if (!firebaseConfigIsComplete()) {
     alert("Paste your Firebase configuration into the firebaseConfig section first.");
@@ -1158,8 +1691,11 @@ onAuthStateChanged(auth, async user => {
 
     loginCard.classList.add("hidden");
     userCard.classList.remove("hidden");
-    statsCard.classList.remove("hidden");
-    form.classList.remove("hidden");
+    leaderSelectionCard.classList.add("hidden");
+    roleCard.classList.add("hidden");
+    managementDashboard.classList.add("hidden");
+    statsCard.classList.add("hidden");
+    form.classList.add("hidden");
 
     const nameInput = document.getElementById("name");
     if (nameInput && !nameInput.value) {
@@ -1169,9 +1705,33 @@ onAuthStateChanged(auth, async user => {
     authMessage.textContent = "Signed in successfully.";
 
     try {
-      await saveUserProfile(user);
-      await loadSelectedSummary();
-      await updateDailySubmissionStatus();
+      currentUserProfile = await saveUserProfile(user);
+      currentUserRole = currentUserProfile.role || determineRole(user.email);
+
+      roleDisplay.textContent =
+        currentUserRole.charAt(0).toUpperCase() + currentUserRole.slice(1);
+      profileRoleDisplay.textContent =
+        currentUserRole.charAt(0).toUpperCase() + currentUserRole.slice(1);
+
+      roleCard.classList.remove("hidden");
+
+      if (roleCanManage(currentUserRole)) {
+        managementDashboard.classList.remove("hidden");
+        managementTitle.textContent =
+          currentUserRole === "leader"
+            ? "👥 My Team Dashboard"
+            : "👑 Admin / Owner Dashboard";
+        managementMonth.value = getMonthKey();
+      } else {
+        managementDashboard.classList.add("hidden");
+      }
+
+      const leaderAlreadySelected = showLeaderSelection(currentUserProfile);
+
+      if (leaderAlreadySelected) {
+        await loadSelectedSummary();
+        await updateDailySubmissionStatus();
+      }
     } catch (error) {
       console.error("Profile setup failed:", error);
       historyStatus.textContent =
@@ -1179,10 +1739,14 @@ onAuthStateChanged(auth, async user => {
     }
   } else {
     currentMemberId = "";
+    currentUserRole = "member";
+    currentUserProfile = null;
     userHistory = [];
 
     loginCard.classList.remove("hidden");
     userCard.classList.add("hidden");
+    leaderSelectionCard.classList.add("hidden");
+    roleCard.classList.add("hidden");
     statsCard.classList.add("hidden");
     form.classList.add("hidden");
     output.classList.add("hidden");
@@ -1336,7 +1900,10 @@ form.addEventListener("submit", async event => {
     paTypesArray: paTypes,
     exercise: exerciseValue || "None",
     meditation: document.getElementById("meditation").value,
-    journal: document.getElementById("journal").value.trim()
+    journal: document.getElementById("journal").value.trim(),
+    role: currentUserRole,
+    leaderEmail: currentUserProfile?.leaderEmail || "",
+    leaderName: currentUserProfile?.leaderName || ""
   };
 
   const result =
@@ -1436,6 +2003,7 @@ restoreDraft();
 
 summaryMonth.value = getMonthKey();
 summaryYear.value = Number(getYearKey());
+managementMonth.value = getMonthKey();
 
 if (!firebaseConfigIsComplete()) {
   authMessage.textContent =
@@ -1451,6 +2019,19 @@ users/{uid}/submissions/{date}
 users/{uid}/monthlySummaries/{month}
 users/{uid}/yearlySummaries/{year}
 only when request.auth.uid == uid.
+
+The user profile also stores:
+role, leaderEmail, and leaderName.
+
+Admin emails:
+- ponugotibiz@gmail.com
+- vidyadhart@gmail.com
+
+Leader emails:
+- alwaysprav2003@gmail.com
+- vidyadhart@gmail.com
+- vinay@atyam.com
+- ponugotibiz@gmail.com
 -->
 
 </body>
