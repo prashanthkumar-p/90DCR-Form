@@ -871,7 +871,43 @@ Chapter ${data.chapterNumber || "N/A"} - ${data.chapterName || "N/A"}
 applyTheme();
 restoreDraft();
 renderStats();
-</script>
+<script type="module">
+  import { initializeApp } from
+  "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged
+} from
+  "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  serverTimestamp
+} from
+  "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+  const firebaseConfig = {
+  apiKey: "AIzaSyDKc98VWu8F0t5fcuRxwQhJHa09xaqAwpc",
+  authDomain: "dcr-growth-system-cc4ad.firebaseapp.com",
+  projectId: "dcr-growth-system-cc4ad",
+  storageBucket: "dcr-growth-system-cc4ad.firebasestorage.app",
+  messagingSenderId: "527197262410",
+  appId: "1:527197262410:web:568e508ae95639e55cccb3",
+  measurementId: "G-EXF7E4VFJM"
+};
+  const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
+const googleProvider = new GoogleAuthProvider();
 
 </body>
 </html>
