@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#2f7d4f" />
-<title>DCR Growth System v4</title>
+<title>DCR Growth System v5</title>
 <link rel="manifest" href="manifest.json" />
 
 <style>
@@ -287,25 +287,68 @@
   </div>
 
   <div class="card hidden" id="statsCard">
-    <h3>📊 Running Totals</h3>
-    <div class="stats-grid">
-      <div class="stat-box">
-        <div class="stat-number" id="totalBooks">0</div>
-        <div class="stat-label">Total Books Completed</div>
+    <h3>📊 Growth Summary</h3>
+
+    <div class="row">
+      <div>
+        <label>View Period</label>
+        <select id="summaryPeriod">
+          <option value="month">This Month</option>
+          <option value="year">This Year</option>
+        </select>
       </div>
-      <div class="stat-box">
-        <div class="stat-number" id="totalPAs">0</div>
-        <div class="stat-label">Total PAs</div>
+
+      <div id="monthSelectorBox">
+        <label>Month</label>
+        <input type="month" id="summaryMonth" />
       </div>
-      <div class="stat-box">
-        <div class="stat-number" id="totalConversations">0</div>
-        <div class="stat-label">Total Conversation Days</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-number" id="totalExerciseDays">0</div>
-        <div class="stat-label">Total Exercise Days</div>
+
+      <div id="yearSelectorBox" class="hidden">
+        <label>Year</label>
+        <input type="number" id="summaryYear" min="2020" max="2100" />
       </div>
     </div>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-number" id="summaryBooks">0</div>
+        <div class="stat-label">Books Completed</div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-number" id="summaryAppointments">0</div>
+        <div class="stat-label">Appointments</div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-number" id="summaryWorkoutDays">0</div>
+        <div class="stat-label">Workout Days</div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-number" id="summaryMeditationDays">0</div>
+        <div class="stat-label">Meditation Days</div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-number" id="summaryDcrDays">0</div>
+        <div class="stat-label">DCR Days</div>
+      </div>
+    </div>
+
+    <div class="card" style="box-shadow:none; border:1px solid var(--border); margin-top:14px;">
+      <h3>📋 Appointment Types</h3>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-number" id="apptMG1">0</div><div class="stat-label">MG1</div></div>
+        <div class="stat-box"><div class="stat-number" id="apptBP1">0</div><div class="stat-label">BP1</div></div>
+        <div class="stat-box"><div class="stat-number" id="apptFP1">0</div><div class="stat-label">FP1</div></div>
+        <div class="stat-box"><div class="stat-number" id="apptBP2">0</div><div class="stat-label">BP2</div></div>
+        <div class="stat-box"><div class="stat-number" id="apptFP2">0</div><div class="stat-label">FP2</div></div>
+        <div class="stat-box"><div class="stat-number" id="apptPreLaunch">0</div><div class="stat-label">Pre-Launch</div></div>
+        <div class="stat-box"><div class="stat-number" id="apptLaunch">0</div><div class="stat-label">Launch</div></div>
+        <div class="stat-box"><div class="stat-number" id="apptPostLaunch">0</div><div class="stat-label">Post Launch</div></div>
+      </div>
+    </div>
+
     <div id="historyStatus" class="auth-status">Sign in to load your history.</div>
   </div>
 
@@ -427,11 +470,7 @@
         <option value="IND VES">IND VES</option>
         <option value="AUS VES">AUS VES</option>
       </select>
-
-      <label>What’s one step you’re not willing to delay?</label>
-      <input type="text" id="aFollow" />
-
-      <label>Accountability Message</label>
+<label>Accountability Message</label>
       <select id="accountability">
         <option value="This message">This message</option>
       </select>
@@ -539,6 +578,7 @@ import {
   doc,
   setDoc,
   getDoc,
+  runTransaction,
   collection,
   getDocs,
   query,
@@ -596,6 +636,11 @@ const signedInEmail = document.getElementById("signedInEmail");
 const memberIdDisplay = document.getElementById("memberIdDisplay");
 const authMessage = document.getElementById("authMessage");
 const historyStatus = document.getElementById("historyStatus");
+const summaryPeriod = document.getElementById("summaryPeriod");
+const summaryMonth = document.getElementById("summaryMonth");
+const summaryYear = document.getElementById("summaryYear");
+const monthSelectorBox = document.getElementById("monthSelectorBox");
+const yearSelectorBox = document.getElementById("yearSelectorBox");
 
 const DRAFT_KEY = "dcrReflectionDraftV4";
 const THEME_KEY = "dcrReflectionThemeV4";
@@ -773,35 +818,226 @@ function applyTheme() {
   darkModeBtn.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
 }
 
+
+function getMonthKey(dateString = getLocalDateString()) {
+  return dateString.slice(0, 7);
+}
+
+function getYearKey(dateString = getLocalDateString()) {
+  return dateString.slice(0, 4);
+}
+
+function emptyAppointmentTypes() {
+  return {
+    MG1: 0,
+    BP1: 0,
+    FP1: 0,
+    BP2: 0,
+    FP2: 0,
+    "Pre-Launch": 0,
+    Launch: 0,
+    "Post Launch": 0
+  };
+}
+
+function normalizeSummary(summary = {}) {
+  return {
+    booksCompleted: Number(summary.booksCompleted || 0),
+    completedBookTitles: Array.isArray(summary.completedBookTitles)
+      ? summary.completedBookTitles
+      : [],
+    appointments: Number(summary.appointments || 0),
+    appointmentTypes: {
+      ...emptyAppointmentTypes(),
+      ...(summary.appointmentTypes || {})
+    },
+    workoutDays: Number(summary.workoutDays || 0),
+    meditationDays: Number(summary.meditationDays || 0),
+    dcrDays: Number(summary.dcrDays || 0)
+  };
+}
+
+function updateSummaryValues(existingSummary, data) {
+  const summary = normalizeSummary(existingSummary);
+  const completedBookTitles = [...summary.completedBookTitles];
+
+  if (data.bookCompleted === "Yes" && data.book) {
+    const normalizedBook = data.book.trim().toLowerCase();
+    const alreadyCounted = completedBookTitles.some(
+      title => String(title).trim().toLowerCase() === normalizedBook
+    );
+
+    if (!alreadyCounted) {
+      completedBookTitles.push(data.book.trim());
+    }
+  }
+
+  const appointmentTypes = {
+    ...emptyAppointmentTypes(),
+    ...summary.appointmentTypes
+  };
+
+  const selectedTypes = Array.isArray(data.paTypesArray)
+    ? data.paTypesArray
+    : [];
+
+  selectedTypes.forEach(type => {
+    if (Object.prototype.hasOwnProperty.call(appointmentTypes, type)) {
+      appointmentTypes[type] += 1;
+    }
+  });
+
+  return {
+    booksCompleted: completedBookTitles.length,
+    completedBookTitles,
+    appointments: summary.appointments + Number(data.paCount || 0),
+    appointmentTypes,
+    workoutDays:
+      summary.workoutDays + (data.exercise && data.exercise !== "None" ? 1 : 0),
+    meditationDays:
+      summary.meditationDays + (data.meditation === "Yes" ? 1 : 0),
+    dcrDays: summary.dcrDays + 1,
+    updatedAt: serverTimestamp()
+  };
+}
+
+function renderSummary(summary = {}) {
+  const values = normalizeSummary(summary);
+
+  document.getElementById("summaryBooks").textContent =
+    values.booksCompleted;
+  document.getElementById("summaryAppointments").textContent =
+    values.appointments;
+  document.getElementById("summaryWorkoutDays").textContent =
+    values.workoutDays;
+  document.getElementById("summaryMeditationDays").textContent =
+    values.meditationDays;
+  document.getElementById("summaryDcrDays").textContent =
+    values.dcrDays;
+
+  document.getElementById("apptMG1").textContent =
+    values.appointmentTypes.MG1;
+  document.getElementById("apptBP1").textContent =
+    values.appointmentTypes.BP1;
+  document.getElementById("apptFP1").textContent =
+    values.appointmentTypes.FP1;
+  document.getElementById("apptBP2").textContent =
+    values.appointmentTypes.BP2;
+  document.getElementById("apptFP2").textContent =
+    values.appointmentTypes.FP2;
+  document.getElementById("apptPreLaunch").textContent =
+    values.appointmentTypes["Pre-Launch"];
+  document.getElementById("apptLaunch").textContent =
+    values.appointmentTypes.Launch;
+  document.getElementById("apptPostLaunch").textContent =
+    values.appointmentTypes["Post Launch"];
+}
+
+async function loadSelectedSummary() {
+  if (!currentUser) return;
+
+  try {
+    let summaryRef;
+    let label;
+
+    if (summaryPeriod.value === "month") {
+      const monthKey = summaryMonth.value || getMonthKey();
+      summaryRef = doc(
+        db,
+        "users",
+        currentUser.uid,
+        "monthlySummaries",
+        monthKey
+      );
+      label = monthKey;
+    } else {
+      const yearKey = String(summaryYear.value || getYearKey());
+      summaryRef = doc(
+        db,
+        "users",
+        currentUser.uid,
+        "yearlySummaries",
+        yearKey
+      );
+      label = yearKey;
+    }
+
+    historyStatus.textContent = `Loading summary for ${label}...`;
+
+    const snapshot = await getDoc(summaryRef);
+    renderSummary(snapshot.exists() ? snapshot.data() : {});
+
+    historyStatus.textContent = snapshot.exists()
+      ? `Summary loaded for ${label}.`
+      : `No submissions found for ${label}.`;
+  } catch (error) {
+    console.error("Summary loading failed:", error);
+    historyStatus.textContent =
+      "Could not load the summary. Check Firestore setup and rules.";
+  }
+}
+
+async function saveDailySubmissionAndSummaries(data) {
+  const submissionRef = doc(
+    db,
+    "users",
+    currentUser.uid,
+    "submissions",
+    data.date
+  );
+
+  const monthRef = doc(
+    db,
+    "users",
+    currentUser.uid,
+    "monthlySummaries",
+    getMonthKey(data.date)
+  );
+
+  const yearRef = doc(
+    db,
+    "users",
+    currentUser.uid,
+    "yearlySummaries",
+    getYearKey(data.date)
+  );
+
+  await runTransaction(db, async transaction => {
+    const submissionSnapshot = await transaction.get(submissionRef);
+
+    if (submissionSnapshot.exists()) {
+      throw new Error("ALREADY_SUBMITTED_TODAY");
+    }
+
+    const monthSnapshot = await transaction.get(monthRef);
+    const yearSnapshot = await transaction.get(yearRef);
+
+    const monthSummary = updateSummaryValues(
+      monthSnapshot.exists() ? monthSnapshot.data() : {},
+      data
+    );
+
+    const yearSummary = updateSummaryValues(
+      yearSnapshot.exists() ? yearSnapshot.data() : {},
+      data
+    );
+
+    transaction.set(submissionRef, {
+      ...data,
+      uid: currentUser.uid,
+      memberId: currentMemberId,
+      userEmail: currentUser.email || "",
+      createdAt: serverTimestamp()
+    });
+
+    transaction.set(monthRef, monthSummary, { merge: true });
+    transaction.set(yearRef, yearSummary, { merge: true });
+  });
+}
+
 function calculateStats(history) {
-  const totalPAs = history.reduce(
-    (sum, item) => sum + Number(item.paCount || 0),
-    0
-  );
-
-  const totalConversations = history.reduce(
-    (sum, item) => sum + Number(item.conversationCount || 0),
-    0
-  );
-
-  const exerciseDays = history.filter(item =>
-    item.exercise && item.exercise !== "None"
-  ).length;
-
-  const completedBooks = new Set(
-    history
-      .filter(item => item.bookCompleted === "Yes")
-      .map(item => item.book)
-      .filter(Boolean)
-  );
-
-  document.getElementById("totalBooks").textContent = completedBooks.size;
-  document.getElementById("totalPAs").textContent = totalPAs;
-  document.getElementById("totalConversations").textContent = totalConversations;
-  document.getElementById("totalExerciseDays").textContent = exerciseDays;
-
   historyStatus.textContent =
-    `${history.length} saved submission${history.length === 1 ? "" : "s"} loaded from Firestore.`;
+    `${history.length} saved submission${history.length === 1 ? "" : "s"} found.`;
 }
 
 async function saveUserProfile(user) {
@@ -934,7 +1170,8 @@ onAuthStateChanged(auth, async user => {
 
     try {
       await saveUserProfile(user);
-      await loadUserHistory();
+      await loadSelectedSummary();
+      await updateDailySubmissionStatus();
     } catch (error) {
       console.error("Profile setup failed:", error);
       historyStatus.textContent =
@@ -958,6 +1195,16 @@ onAuthStateChanged(auth, async user => {
       : "Firebase configuration is still required.";
   }
 });
+
+summaryPeriod.addEventListener("change", async () => {
+  const isMonth = summaryPeriod.value === "month";
+  monthSelectorBox.classList.toggle("hidden", !isMonth);
+  yearSelectorBox.classList.toggle("hidden", isMonth);
+  await loadSelectedSummary();
+});
+
+summaryMonth.addEventListener("change", loadSelectedSummary);
+summaryYear.addEventListener("change", loadSelectedSummary);
 
 dcr.addEventListener("change", () => {
   buildDcrDays();
@@ -1078,7 +1325,6 @@ form.addEventListener("submit", async event => {
     chapterName: document.getElementById("chapterName").value.trim(),
     readingTakeaway: document.getElementById("readingTakeaway").value.trim(),
     associate: document.getElementById("associate").value,
-    aFollow: document.getElementById("aFollow").value.trim(),
     accountability: document.getElementById("accountability").value,
     conversation: document.getElementById("conversation").value,
     conversationCount: Number(
@@ -1087,6 +1333,7 @@ form.addEventListener("submit", async event => {
     mode,
     paCount: Number(paCount.value || 0),
     paTypes: paTypes.join(", ") || "N/A",
+    paTypesArray: paTypes,
     exercise: exerciseValue || "None",
     meditation: document.getElementById("meditation").value,
     journal: document.getElementById("journal").value.trim()
@@ -1107,7 +1354,6 @@ form.addEventListener("submit", async event => {
 Chapter ${data.chapterNumber || "N/A"} - ${data.chapterName || "N/A"}
 📝 Reading Takeaways: ${data.readingTakeaway || "N/A"}
 🤝 Associate: ${data.associate}
-🎯 One Step: ${data.aFollow || "N/A"}
 🗣 Conversations: ${data.conversation} (${data.mode}) - ${data.conversationCount}
 📅 PA's Today: ${data.paCount}
 📋 Types: ${data.paTypes}
@@ -1121,23 +1367,9 @@ Chapter ${data.chapterNumber || "N/A"} - ${data.chapterName || "N/A"}
   output.classList.remove("hidden");
 
   try {
-    const submissionRef = doc(
-      db,
-      "users",
-      currentUser.uid,
-      "submissions",
-      data.date
-    );
-
-    await setDoc(submissionRef, {
-      ...data,
-      uid: currentUser.uid,
-      memberId: currentMemberId,
-      userEmail: currentUser.email || "",
-      createdAt: serverTimestamp()
-    });
-
-    await loadUserHistory();
+    await saveDailySubmissionAndSummaries(data);
+    await loadSelectedSummary();
+    await updateDailySubmissionStatus();
 
     try {
       await navigator.clipboard.writeText(result);
@@ -1171,7 +1403,16 @@ Chapter ${data.chapterNumber || "N/A"} - ${data.chapterName || "N/A"}
     alert("Submitted! Saved to your account, copied, and sent to Telegram.");
   } catch (error) {
     console.error("Submission failed:", error);
-    alert("Submission failed. Check Firebase configuration, Firestore, and security rules.");
+
+    if (error.message === "ALREADY_SUBMITTED_TODAY") {
+      alert(
+        "You have already submitted your DCR for today. The next submission window begins at 12:00 AM local time."
+      );
+    } else {
+      alert(
+        "Submission failed. Check Firebase configuration, Firestore, and security rules."
+      );
+    }
   } finally {
     try {
       const submittedToday = currentUser ? await hasSubmittedToday() : false;
@@ -1193,11 +1434,24 @@ Chapter ${data.chapterNumber || "N/A"} - ${data.chapterName || "N/A"}
 applyTheme();
 restoreDraft();
 
+summaryMonth.value = getMonthKey();
+summaryYear.value = Number(getYearKey());
+
 if (!firebaseConfigIsComplete()) {
   authMessage.textContent =
     "Next step: paste your Firebase configuration into this HTML file.";
 }
 </script>
+
+
+<!--
+Required Firestore rules should allow authenticated users to access:
+users/{uid}
+users/{uid}/submissions/{date}
+users/{uid}/monthlySummaries/{month}
+users/{uid}/yearlySummaries/{year}
+only when request.auth.uid == uid.
+-->
 
 </body>
 </html>
