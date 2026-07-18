@@ -319,6 +319,9 @@
 
       <label>Date</label>
       <input type="date" id="date" required />
+      <div class="auth-status">
+        One submission is allowed per day. The daily window runs from 12:00 AM to 11:59 PM in your local time.
+      </div>
 
       <div class="row">
         <div>
@@ -535,6 +538,7 @@ import {
   getFirestore,
   doc,
   setDoc,
+  getDoc,
   collection,
   getDocs,
   query,
@@ -602,9 +606,31 @@ let currentUser = null;
 let currentMemberId = "";
 let userHistory = [];
 
-if (!dateInput.value) {
-  dateInput.valueAsDate = new Date();
+function getLocalDateString(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
+
+function lockDateToToday() {
+  const today = getLocalDateString();
+  dateInput.value = today;
+  dateInput.min = today;
+  dateInput.max = today;
+  dateInput.readOnly = true;
+}
+
+lockDateToToday();
+
+// Refresh the allowed submission date shortly after local midnight.
+setInterval(() => {
+  const today = getLocalDateString();
+  if (dateInput.value !== today) {
+    lockDateToToday();
+    localStorage.removeItem(DRAFT_KEY);
+  }
+}, 60000);
 
 function firebaseConfigIsComplete() {
   return !Object.values(firebaseConfig).some(value =>
@@ -699,6 +725,8 @@ function restoreDraft() {
   isRestoring = true;
 
   Object.keys(savedDraft).forEach(id => {
+    if (id === "date") return;
+
     const field = document.getElementById(id);
     if (!field) return;
 
@@ -709,9 +737,7 @@ function restoreDraft() {
     }
   });
 
-  if (!dateInput.value) {
-    dateInput.valueAsDate = new Date();
-  }
+  lockDateToToday();
 
   buildDcrDays();
 
@@ -791,6 +817,38 @@ async function saveUserProfile(user) {
   }, { merge: true });
 }
 
+async function hasSubmittedToday() {
+  if (!currentUser) return false;
+
+  const today = getLocalDateString();
+  const submissionRef = doc(
+    db,
+    "users",
+    currentUser.uid,
+    "submissions",
+    today
+  );
+
+  const snapshot = await getDoc(submissionRef);
+  return snapshot.exists();
+}
+
+async function updateDailySubmissionStatus() {
+  if (!currentUser) return;
+
+  const submitted = await hasSubmittedToday();
+
+  if (submitted) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Already Submitted Today";
+    historyStatus.textContent =
+      "Today's DCR has already been submitted. You can submit again after 12:00 AM local time.";
+  } else {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit Reflection";
+  }
+}
+
 async function loadUserHistory() {
   if (!currentUser) return;
 
@@ -813,6 +871,7 @@ async function loadUserHistory() {
     }));
 
     calculateStats(userHistory);
+    await updateDailySubmissionStatus();
   } catch (error) {
     console.error("History loading failed:", error);
     historyStatus.textContent =
@@ -970,6 +1029,25 @@ form.addEventListener("submit", async event => {
     return;
   }
 
+  lockDateToToday();
+
+  try {
+    const alreadySubmitted = await hasSubmittedToday();
+
+    if (alreadySubmitted) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Already Submitted Today";
+      alert(
+        "You have already submitted your DCR for today. The next submission window begins at 12:00 AM local time."
+      );
+      return;
+    }
+  } catch (error) {
+    console.error("Daily submission check failed:", error);
+    alert("Could not verify today's submission. Please try again.");
+    return;
+  }
+
   submitBtn.disabled = true;
   submitBtn.textContent = "Submitting...";
 
@@ -986,7 +1064,7 @@ form.addEventListener("submit", async event => {
     : book.value;
 
   const data = {
-    date: dateInput.value,
+    date: getLocalDateString(),
     name: document.getElementById("name").value.trim(),
     dcr: dcr.value,
     dcrDay: dcrDay.value,
@@ -1056,8 +1134,8 @@ Chapter ${data.chapterNumber || "N/A"} - ${data.chapterName || "N/A"}
       uid: currentUser.uid,
       memberId: currentMemberId,
       userEmail: currentUser.email || "",
-      updatedAt: serverTimestamp()
-    }, { merge: true });
+      createdAt: serverTimestamp()
+    });
 
     await loadUserHistory();
 
@@ -1095,8 +1173,20 @@ Chapter ${data.chapterNumber || "N/A"} - ${data.chapterName || "N/A"}
     console.error("Submission failed:", error);
     alert("Submission failed. Check Firebase configuration, Firestore, and security rules.");
   } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Submit Reflection";
+    try {
+      const submittedToday = currentUser ? await hasSubmittedToday() : false;
+
+      if (submittedToday) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Already Submitted Today";
+      } else {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit Reflection";
+      }
+    } catch (error) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Reflection";
+    }
   }
 });
 
