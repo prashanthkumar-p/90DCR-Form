@@ -756,6 +756,7 @@ import {
   collection,
   getDocs,
   query,
+  where,
   orderBy,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
@@ -1578,7 +1579,19 @@ async function loadManagementMetrics() {
   loadManagementBtn.disabled = true;
 
   try {
-    const usersSnapshot = await getDocs(collection(db, "users"));
+    let usersQuery;
+
+    if (currentUserRole === "leader") {
+      usersQuery = query(
+        collection(db, "users"),
+        where("leaderEmail", "==", normalizeEmail(currentUser.email))
+      );
+    } else {
+      usersQuery = collection(db, "users");
+    }
+
+    const usersSnapshot = await getDocs(usersQuery);
+
     const visibleProfiles = usersSnapshot.docs
       .map(item => ({ uid: item.id, ...item.data() }))
       .filter(profile => memberIsVisibleToCurrentUser(profile));
