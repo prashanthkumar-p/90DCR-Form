@@ -1,33 +1,10 @@
-<div class="card" id="loginCard">
-  <h3>Welcome to DCR Growth</h3>
-  <p id="loginMessage">
-    Sign in to access your DCR history and progress.
-  </p>
-  <button type="button" id="googleLoginBtn">
-    Sign in with Google
-  </button>
-</div>
-<div class="card hidden" id="userCard">
-  <h3>Your Profile</h3>
-  <p>
-    <strong>Name:</strong>
-    <span id="signedInName"></span>
-  </p>
-  <p>
-    <strong>Member ID:</strong>
-    <span id="memberIdDisplay"></span>
-  </p>
-  <button type="button" id="logoutBtn">
-    Sign Out
-  </button>
-</div>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#2f7d4f" />
-<title>DCR Reflection v2.0</title>
+<title>DCR Growth System v4</title>
 <link rel="manifest" href="manifest.json" />
 
 <style>
@@ -253,6 +230,25 @@
     display: none;
   }
 
+
+  .auth-status {
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin-top: 12px;
+    font-size: 14px;
+    background: var(--soft);
+    border: 1px solid var(--border);
+  }
+
+  .profile-line {
+    margin: 8px 0;
+    word-break: break-word;
+  }
+
+  .danger-btn {
+    background: #b91c1c;
+  }
+
   @media (max-width: 520px) {
     .row, .pa-grid, .exercise-grid, .stats-grid, .toolbar {
       grid-template-columns: 1fr;
@@ -267,7 +263,7 @@
 
   <div class="hero">
     <div class="brand">α Team</div>
-    <h1>DCR Reflection </h1>
+    <h1>DCR Growth System</h1>
     <div class="tagline">You do not rise to the level of your goals; you fall to the level of your systems..</div>
     <div class="toolbar">
       <button type="button" id="darkModeBtn">🌙 Dark Mode</button>
@@ -275,7 +271,22 @@
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" id="loginCard">
+    <h3>🔐 Welcome</h3>
+    <p>Sign in with Google to access your DCR form, previous submissions, and growth metrics.</p>
+    <button type="button" id="googleLoginBtn">Sign in with Google</button>
+    <div id="authMessage" class="auth-status">Not signed in.</div>
+  </div>
+
+  <div class="card hidden" id="userCard">
+    <h3>👤 My Profile</h3>
+    <p class="profile-line"><strong>Name:</strong> <span id="signedInName"></span></p>
+    <p class="profile-line"><strong>Email:</strong> <span id="signedInEmail"></span></p>
+    <p class="profile-line"><strong>Member ID:</strong> <span id="memberIdDisplay"></span></p>
+    <button type="button" id="logoutBtn" class="danger-btn">Sign Out</button>
+  </div>
+
+  <div class="card hidden" id="statsCard">
     <h3>📊 Running Totals</h3>
     <div class="stats-grid">
       <div class="stat-box">
@@ -295,10 +306,10 @@
         <div class="stat-label">Total Exercise Days</div>
       </div>
     </div>
-    <button type="button" id="resetStatsBtn" class="secondary-btn">Reset Running Totals</button>
+    <div id="historyStatus" class="auth-status">Sign in to load your history.</div>
   </div>
 
-  <form id="reflectionForm">
+  <form id="reflectionForm" class="hidden">
 
     <div class="card">
       <h3>🏃 DCR</h3>
@@ -432,6 +443,9 @@
         <option value="No">No</option>
       </select>
 
+      <label>Number of Conversations</label>
+      <input type="number" id="conversationCount" min="0" max="100" value="0" />
+
       <label>Mode</label>
       <select id="mode">
         <option value="Online">Online</option>
@@ -506,7 +520,48 @@
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+/*
+  IMPORTANT:
+  Replace every value below with the exact firebaseConfig values
+  shown in Firebase Console → Project Settings → Your apps → Web app.
+*/
+const firebaseConfig = {
+  apiKey: "AIzaSyDKc98VWu8F0t5fcuRxwQhJHa09xaqAwpc",
+  authDomain: "dcr-growth-system-cc4ad.firebaseapp.com",
+  projectId: "dcr-growth-system-cc4ad",
+  storageBucket: "dcr-growth-system-cc4ad.firebasestorage.app",
+  messagingSenderId: "527197262410",
+  appId: "1:527197262410:web:568e508ae95639e55cccb3",
+  measurementId: "G-EXF7E4VFJM"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
+const googleProvider = new GoogleAuthProvider();
+
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxI7YYgib0Ttox7DiIsju6KHJ7pcsstYml_mCM4MpwvDpxCpGfT5Q4lZCHceeE49GE0/exec";
 
 const form = document.getElementById("reflectionForm");
@@ -523,19 +578,42 @@ const output = document.getElementById("output");
 const submitBtn = document.getElementById("submitBtn");
 const darkModeBtn = document.getElementById("darkModeBtn");
 const installBtn = document.getElementById("installBtn");
-const resetStatsBtn = document.getElementById("resetStatsBtn");
 const progressText = document.getElementById("progressText");
 const progressPercent = document.getElementById("progressPercent");
 const progressFill = document.getElementById("progressFill");
 
-const DRAFT_KEY = "dcrReflectionDraftV3";
-const STATS_KEY = "dcrReflectionStatsV3";
-const THEME_KEY = "dcrReflectionThemeV3";
+const loginCard = document.getElementById("loginCard");
+const userCard = document.getElementById("userCard");
+const statsCard = document.getElementById("statsCard");
+const googleLoginBtn = document.getElementById("googleLoginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const signedInName = document.getElementById("signedInName");
+const signedInEmail = document.getElementById("signedInEmail");
+const memberIdDisplay = document.getElementById("memberIdDisplay");
+const authMessage = document.getElementById("authMessage");
+const historyStatus = document.getElementById("historyStatus");
+
+const DRAFT_KEY = "dcrReflectionDraftV4";
+const THEME_KEY = "dcrReflectionThemeV4";
+
 let deferredPrompt = null;
 let isRestoring = false;
+let currentUser = null;
+let currentMemberId = "";
+let userHistory = [];
 
 if (!dateInput.value) {
   dateInput.valueAsDate = new Date();
+}
+
+function firebaseConfigIsComplete() {
+  return !Object.values(firebaseConfig).some(value =>
+    String(value).startsWith("PASTE_YOUR_")
+  );
+}
+
+function createMemberId(uid) {
+  return `DCR-${uid.substring(0, 8).toUpperCase()}`;
 }
 
 function buildDcrDays() {
@@ -571,9 +649,7 @@ function updateProgress() {
     return;
   }
 
-  const parts = dcrDay.value.split("/");
-  const current = Number(parts[0]);
-  const total = Number(parts[1]);
+  const [current, total] = dcrDay.value.split("/").map(Number);
   const percent = total ? Math.round((current / total) * 100) : 0;
 
   progressText.textContent = `Progress: Day ${current}/${total}`;
@@ -605,36 +681,15 @@ function updateBookOtherVisibility() {
   }
 }
 
-function getStats() {
-  return JSON.parse(localStorage.getItem(STATS_KEY)) || {
-    booksCompleted: 0,
-    totalPAs: 0,
-    conversationDays: 0,
-    exerciseDays: 0
-  };
-}
-
-function saveStats(stats) {
-  localStorage.setItem(STATS_KEY, JSON.stringify(stats));
-  renderStats();
-}
-
-function renderStats() {
-  const stats = getStats();
-  document.getElementById("totalBooks").textContent = stats.booksCompleted;
-  document.getElementById("totalPAs").textContent = stats.totalPAs;
-  document.getElementById("totalConversations").textContent = stats.conversationDays;
-  document.getElementById("totalExerciseDays").textContent = stats.exerciseDays;
-}
-
 function saveDraft() {
   if (isRestoring) return;
 
   const draft = {};
-  document.querySelectorAll("input, textarea, select").forEach(field => {
-    if (!field.id) return;
-    draft[field.id] = field.type === "checkbox" ? field.checked : field.value;
-  });
+  document.querySelectorAll("#reflectionForm input, #reflectionForm textarea, #reflectionForm select")
+    .forEach(field => {
+      if (!field.id) return;
+      draft[field.id] = field.type === "checkbox" ? field.checked : field.value;
+    });
 
   localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
 }
@@ -659,14 +714,15 @@ function restoreDraft() {
   }
 
   buildDcrDays();
+
   if (savedDraft.dcrDay) {
     dcrDay.value = savedDraft.dcrDay;
   }
+
   updateProgress();
   updatePaTypesVisibility();
   updateExerciseOtherVisibility();
   updateBookOtherVisibility();
-
   isRestoring = false;
 }
 
@@ -676,6 +732,7 @@ function getSelectedExercises() {
 
   if (selected.includes("Other")) {
     const otherText = document.getElementById("otherExercise").value.trim();
+
     return selected
       .filter(item => item !== "Other")
       .concat(otherText ? [otherText] : ["Other"]);
@@ -685,31 +742,163 @@ function getSelectedExercises() {
 }
 
 function applyTheme() {
-  const savedTheme = localStorage.getItem(THEME_KEY);
-  const isDark = savedTheme === "dark";
+  const isDark = localStorage.getItem(THEME_KEY) === "dark";
   document.body.classList.toggle("dark", isDark);
   darkModeBtn.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
 }
 
-function updateStatsAfterSubmit(data) {
-  const stats = getStats();
+function calculateStats(history) {
+  const totalPAs = history.reduce(
+    (sum, item) => sum + Number(item.paCount || 0),
+    0
+  );
 
-  if (document.getElementById("bookCompleted").value === "Yes") {
-    stats.booksCompleted += 1;
-  }
+  const totalConversations = history.reduce(
+    (sum, item) => sum + Number(item.conversationCount || 0),
+    0
+  );
 
-  stats.totalPAs += Number(data.paCount || 0);
+  const exerciseDays = history.filter(item =>
+    item.exercise && item.exercise !== "None"
+  ).length;
 
-  if (data.conversation === "Yes") {
-    stats.conversationDays += 1;
-  }
+  const completedBooks = new Set(
+    history
+      .filter(item => item.bookCompleted === "Yes")
+      .map(item => item.book)
+      .filter(Boolean)
+  );
 
-  if (data.exercise && data.exercise !== "None") {
-    stats.exerciseDays += 1;
-  }
+  document.getElementById("totalBooks").textContent = completedBooks.size;
+  document.getElementById("totalPAs").textContent = totalPAs;
+  document.getElementById("totalConversations").textContent = totalConversations;
+  document.getElementById("totalExerciseDays").textContent = exerciseDays;
 
-  saveStats(stats);
+  historyStatus.textContent =
+    `${history.length} saved submission${history.length === 1 ? "" : "s"} loaded from Firestore.`;
 }
+
+async function saveUserProfile(user) {
+  const profileRef = doc(db, "users", user.uid);
+
+  await setDoc(profileRef, {
+    uid: user.uid,
+    memberId: createMemberId(user.uid),
+    name: user.displayName || "",
+    email: user.email || "",
+    photoURL: user.photoURL || "",
+    updatedAt: serverTimestamp()
+  }, { merge: true });
+}
+
+async function loadUserHistory() {
+  if (!currentUser) return;
+
+  historyStatus.textContent = "Loading previous submissions...";
+
+  try {
+    const submissionsRef = collection(
+      db,
+      "users",
+      currentUser.uid,
+      "submissions"
+    );
+
+    const historyQuery = query(submissionsRef, orderBy("date", "desc"));
+    const snapshot = await getDocs(historyQuery);
+
+    userHistory = snapshot.docs.map(item => ({
+      id: item.id,
+      ...item.data()
+    }));
+
+    calculateStats(userHistory);
+  } catch (error) {
+    console.error("History loading failed:", error);
+    historyStatus.textContent =
+      "Could not load history. Check Firestore setup and security rules.";
+  }
+}
+
+googleLoginBtn.addEventListener("click", async () => {
+  if (!firebaseConfigIsComplete()) {
+    alert("Paste your Firebase configuration into the firebaseConfig section first.");
+    return;
+  }
+
+  try {
+    googleLoginBtn.disabled = true;
+    googleLoginBtn.textContent = "Signing in...";
+    authMessage.textContent = "Opening Google sign-in...";
+
+    await signInWithPopup(auth, googleProvider);
+  } catch (error) {
+    console.error("Google sign-in failed:", error);
+    authMessage.textContent = `Sign-in failed: ${error.message}`;
+    alert("Google sign-in failed. Confirm Google is enabled and your GitHub domain is authorized.");
+  } finally {
+    googleLoginBtn.disabled = false;
+    googleLoginBtn.textContent = "Sign in with Google";
+  }
+});
+
+logoutBtn.addEventListener("click", async () => {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.error("Sign-out failed:", error);
+    alert("Unable to sign out. Please try again.");
+  }
+});
+
+onAuthStateChanged(auth, async user => {
+  currentUser = user;
+
+  if (user) {
+    currentMemberId = createMemberId(user.uid);
+
+    signedInName.textContent = user.displayName || "DCR Member";
+    signedInEmail.textContent = user.email || "No email available";
+    memberIdDisplay.textContent = currentMemberId;
+
+    loginCard.classList.add("hidden");
+    userCard.classList.remove("hidden");
+    statsCard.classList.remove("hidden");
+    form.classList.remove("hidden");
+
+    const nameInput = document.getElementById("name");
+    if (nameInput && !nameInput.value) {
+      nameInput.value = user.displayName || "";
+    }
+
+    authMessage.textContent = "Signed in successfully.";
+
+    try {
+      await saveUserProfile(user);
+      await loadUserHistory();
+    } catch (error) {
+      console.error("Profile setup failed:", error);
+      historyStatus.textContent =
+        "Signed in, but Firestore could not be accessed. Check your database and rules.";
+    }
+  } else {
+    currentMemberId = "";
+    userHistory = [];
+
+    loginCard.classList.remove("hidden");
+    userCard.classList.add("hidden");
+    statsCard.classList.add("hidden");
+    form.classList.add("hidden");
+    output.classList.add("hidden");
+
+    signedInName.textContent = "";
+    signedInEmail.textContent = "";
+    memberIdDisplay.textContent = "";
+    authMessage.textContent = firebaseConfigIsComplete()
+      ? "Not signed in."
+      : "Firebase configuration is still required.";
+  }
+});
 
 dcr.addEventListener("change", () => {
   buildDcrDays();
@@ -738,10 +927,11 @@ document.querySelectorAll(".exerciseType").forEach(cb => {
   });
 });
 
-document.querySelectorAll("input, textarea, select").forEach(field => {
-  field.addEventListener("input", saveDraft);
-  field.addEventListener("change", saveDraft);
-});
+document.querySelectorAll("#reflectionForm input, #reflectionForm textarea, #reflectionForm select")
+  .forEach(field => {
+    field.addEventListener("input", saveDraft);
+    field.addEventListener("change", saveDraft);
+  });
 
 darkModeBtn.addEventListener("click", () => {
   const isDark = document.body.classList.toggle("dark");
@@ -749,21 +939,9 @@ darkModeBtn.addEventListener("click", () => {
   darkModeBtn.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
 });
 
-resetStatsBtn.addEventListener("click", () => {
-  const confirmReset = confirm("Are you sure you want to reset all running totals?");
-  if (!confirmReset) return;
-
-  saveStats({
-    booksCompleted: 0,
-    totalPAs: 0,
-    conversationDays: 0,
-    exerciseDays: 0
-  });
-});
-
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
+window.addEventListener("beforeinstallprompt", event => {
+  event.preventDefault();
+  deferredPrompt = event;
   installBtn.classList.remove("hidden");
 });
 
@@ -778,14 +956,19 @@ installBtn.addEventListener("click", async () => {
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("service-worker.js").catch(err => {
-      console.log("Service worker registration failed", err);
+    navigator.serviceWorker.register("service-worker.js").catch(error => {
+      console.log("Service worker registration failed", error);
     });
   });
 }
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+form.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  if (!currentUser) {
+    alert("Please sign in before submitting.");
+    return;
+  }
 
   submitBtn.disabled = true;
   submitBtn.textContent = "Submitting...";
@@ -799,36 +982,39 @@ form.addEventListener("submit", async (e) => {
   const exerciseValue = getSelectedExercises().join(", ");
 
   const bookValue = book.value === "Other"
-    ? document.getElementById("otherBook").value
+    ? document.getElementById("otherBook").value.trim()
     : book.value;
 
   const data = {
     date: dateInput.value,
-    name: document.getElementById("name").value,
+    name: document.getElementById("name").value.trim(),
     dcr: dcr.value,
     dcrDay: dcrDay.value,
     used: document.getElementById("used").value,
-    audioTrack: document.getElementById("audioTrack").value,
-    speaker: document.getElementById("speaker").value,
-    listenTakeaway: document.getElementById("listenTakeaway").value,
+    audioTrack: document.getElementById("audioTrack").value.trim(),
+    speaker: document.getElementById("speaker").value.trim(),
+    listenTakeaway: document.getElementById("listenTakeaway").value.trim(),
     book: bookValue,
     bookCompleted: document.getElementById("bookCompleted").value,
-    chapterNumber: document.getElementById("chapterNumber").value,
-    chapterName: document.getElementById("chapterName").value,
-    readingTakeaway: document.getElementById("readingTakeaway").value,
+    chapterNumber: document.getElementById("chapterNumber").value.trim(),
+    chapterName: document.getElementById("chapterName").value.trim(),
+    readingTakeaway: document.getElementById("readingTakeaway").value.trim(),
     associate: document.getElementById("associate").value,
-    aFollow: document.getElementById("aFollow").value,
+    aFollow: document.getElementById("aFollow").value.trim(),
     accountability: document.getElementById("accountability").value,
     conversation: document.getElementById("conversation").value,
+    conversationCount: Number(
+      document.getElementById("conversationCount").value || 0
+    ),
     mode,
-    paCount: paCount.value,
+    paCount: Number(paCount.value || 0),
     paTypes: paTypes.join(", ") || "N/A",
     exercise: exerciseValue || "None",
     meditation: document.getElementById("meditation").value,
-    journal: document.getElementById("journal").value
+    journal: document.getElementById("journal").value.trim()
   };
 
-const result =
+  const result =
 `━━━━━━━━━━━━━━━━━━
 
 🏃 ${data.name.toUpperCase()}- ${data.dcr} • Day ${data.dcrDay}
@@ -844,7 +1030,7 @@ Chapter ${data.chapterNumber || "N/A"} - ${data.chapterName || "N/A"}
 📝 Reading Takeaways: ${data.readingTakeaway || "N/A"}
 🤝 Associate: ${data.associate}
 🎯 One Step: ${data.aFollow || "N/A"}
-🗣 Conversations: ${data.conversation} (${data.mode})
+🗣 Conversations: ${data.conversation} (${data.mode}) - ${data.conversationCount}
 📅 PA's Today: ${data.paCount}
 📋 Types: ${data.paTypes}
 🏃 Physical Exercise: ${data.exercise}
@@ -856,21 +1042,45 @@ Chapter ${data.chapterNumber || "N/A"} - ${data.chapterName || "N/A"}
   output.textContent = result;
   output.classList.remove("hidden");
 
-  updateStatsAfterSubmit(data);
-  saveDraft();
-
   try {
-    await navigator.clipboard.writeText(result);
-  } catch (err) {
-    console.log("Clipboard failed", err);
-  }
+    const submissionRef = doc(
+      db,
+      "users",
+      currentUser.uid,
+      "submissions",
+      data.date
+    );
 
-  try {
-    await fetch(SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      body: JSON.stringify(data)
-    });
+    await setDoc(submissionRef, {
+      ...data,
+      uid: currentUser.uid,
+      memberId: currentMemberId,
+      userEmail: currentUser.email || "",
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
+    await loadUserHistory();
+
+    try {
+      await navigator.clipboard.writeText(result);
+    } catch (clipboardError) {
+      console.log("Clipboard failed", clipboardError);
+    }
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify({
+          ...data,
+          uid: currentUser.uid,
+          memberId: currentMemberId,
+          userEmail: currentUser.email || ""
+        })
+      });
+    } catch (telegramError) {
+      console.warn("Firestore saved, but Apps Script/Telegram failed:", telegramError);
+    }
 
     if (["30/30", "60/90", "90/90"].includes(data.dcrDay)) {
       confetti({
@@ -880,57 +1090,24 @@ Chapter ${data.chapterNumber || "N/A"} - ${data.chapterName || "N/A"}
       });
     }
 
-    alert("Submitted! Copied and sent to Telegram.");
-
+    alert("Submitted! Saved to your account, copied, and sent to Telegram.");
   } catch (error) {
-    console.error(error);
-    alert("Submission failed. Check console.");
+    console.error("Submission failed:", error);
+    alert("Submission failed. Check Firebase configuration, Firestore, and security rules.");
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit Reflection";
   }
-
-  submitBtn.disabled = false;
-  submitBtn.textContent = "Submit Reflection";
 });
 
 applyTheme();
 restoreDraft();
-renderStats();
-<script type="module">
-  import { initializeApp } from
-  "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged
-} from
-  "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  collection,
-  getDocs,
-  query,
-  orderBy,
-  serverTimestamp
-} from
-  "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
-  const firebaseConfig = {
-  apiKey: "AIzaSyDKc98VWu8F0t5fcuRxwQhJHa09xaqAwpc",
-  authDomain: "dcr-growth-system-cc4ad.firebaseapp.com",
-  projectId: "dcr-growth-system-cc4ad",
-  storageBucket: "dcr-growth-system-cc4ad.firebasestorage.app",
-  messagingSenderId: "527197262410",
-  appId: "1:527197262410:web:568e508ae95639e55cccb3",
-  measurementId: "G-EXF7E4VFJM"
-};
-  const firebaseApp = initializeApp(firebaseConfig);
-const auth = getAuth(firebaseApp);
-const db = getFirestore(firebaseApp);
-const googleProvider = new GoogleAuthProvider();
+if (!firebaseConfigIsComplete()) {
+  authMessage.textContent =
+    "Next step: paste your Firebase configuration into this HTML file.";
+}
+</script>
 
 </body>
 </html>
